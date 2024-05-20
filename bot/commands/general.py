@@ -2,6 +2,7 @@ import disnake
 from disnake.ext import commands
 
 from config import GUILD_ID
+from utils.logger import logger
 
 
 class GeneralCommands(commands.Cog):
@@ -16,6 +17,7 @@ class GeneralCommands(commands.Cog):
         """
         返回機器人延遲
         """
+        logger.info(f'Pong! 延遲: {round(self.bot.latency * 1000)}ms')
         await inter.response.send_message(f'Pong! 延遲: {round(self.bot.latency * 1000)}ms')
 
 

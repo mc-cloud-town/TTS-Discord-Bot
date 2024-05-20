@@ -1,5 +1,7 @@
 from disnake.ext import commands
 
+from utils.logger import logger
+
 
 class OnReady(commands.Cog):
     def __init__(self, bot):
@@ -7,7 +9,7 @@ class OnReady(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print(f'Logged in as {self.bot.user.name}')
+        logger.info(f'Logged in as {self.bot.user} (ID: {self.bot.user.id})')
 
 
 def setup(bot):

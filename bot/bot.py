@@ -1,6 +1,7 @@
 from disnake.ext import commands
 
 import config
+from utils.logger import logger
 
 bot = commands.InteractionBot()
 
@@ -13,4 +14,5 @@ bot.load_extension('bot.events.on_ready')
 
 
 def run():
+    logger.info('Starting bot...')
     bot.run(config.DISCORD_TOKEN)
