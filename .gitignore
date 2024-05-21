@@ -23,6 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 *pyc
+data/samples/*.mp3
+data/samples/*.wav
+data/samples/*.ogg
 
 .vite-react-ssg-temp/
 cache-images
