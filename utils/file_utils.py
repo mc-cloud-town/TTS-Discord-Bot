@@ -14,7 +14,7 @@ def load_sample_data(file_path='data/sample_data.json'):
         return json.load(f)
 
 
-def get_samples_by_character(character_name: str, sample_data_dict: dict) -> list:
+def get_samples_by_character(character_name: str, sample_data_dict: dict) -> dict:
     """
     通過角色名稱獲取語音樣本
     Args:
@@ -22,9 +22,9 @@ def get_samples_by_character(character_name: str, sample_data_dict: dict) -> lis
         sample_data_dict: 語音樣本數據
 
     Returns:
-        list: 語音樣本
+        dict: 語音樣本
     """
-    return sample_data_dict.get(character_name, [])
+    return sample_data_dict.get(character_name, {})
 
 
 def list_characters(sample_data_dict: dict) -> list:
