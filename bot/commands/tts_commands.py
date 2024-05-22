@@ -17,7 +17,7 @@ class TTSCommands(commands.Cog):
         self.sample_data = load_sample_data()
         self.lock = asyncio.Lock()
         self.max_retries = 3
-        self.retry_delay = 2  # seconds
+        self.retry_delay = 2
 
     @commands.slash_command(
         name="set_voice",
@@ -48,7 +48,14 @@ class TTSCommands(commands.Cog):
         settings = {"selected_sample": character_name}
         user_settings.set_user_settings(user_id, settings)
         logger.info(f'Set voice sample to {character_name} for user {inter.author}')
-        await inter.edit_original_response(f'語音樣本設置為 {character_name}')
+
+        embed = disnake.Embed(
+            title="語音樣本",
+            description=f"語音樣本設置為 {character_name}",
+            color=disnake.Color.green()
+        )
+
+        await inter.edit_original_response(embed=embed)
 
     @commands.slash_command(
         name="get_voice",
@@ -67,7 +74,14 @@ class TTSCommands(commands.Cog):
         settings = user_settings.get_user_settings(user_id)
         sample_name = settings.get("selected_sample", "未設置")
         logger.info(f'Get voice sample for user {inter.author}')
-        await inter.edit_original_response(f'你當前的語音樣本是 {sample_name}')
+
+        embed = disnake.Embed(
+            title="語音樣本",
+            description=f"你當前的語音樣本是 {sample_name}",
+            color=disnake.Color.green()
+        )
+
+        await inter.edit_original_response(embed=embed)
 
     @commands.slash_command(
         name="play_tts",
@@ -88,7 +102,12 @@ class TTSCommands(commands.Cog):
         character_name = settings.get("selected_sample", "")
 
         if not character_name:
-            await inter.edit_original_response("你尚未設置語音樣本。")
+            embed = disnake.Embed(
+                title="錯誤",
+                description="你尚未設置語音樣本。",
+                color=disnake.Color.red()
+            )
+            await inter.edit_original_response(embed=embed)
             return
 
         voice_state = inter.author.voice
@@ -101,10 +120,23 @@ class TTSCommands(commands.Cog):
             await inter.edit_original_response(embed=embed)
             return
 
-        voice_client = inter.guild.voice_client
+        voice_client: disnake.VoiceClient | None = inter.guild.voice_client
         if not voice_client:
-            await inter.edit_original_response(
-                "機器人不在任何語音頻道。請先使用 `/join_voice` 命令讓機器人加入語音頻道。")
+            embed = disnake.Embed(
+                title="錯誤",
+                description="機器人不在任何語音頻道。請先使用 `/join_voice` 命令讓機器人加入語音頻道。",
+                color=disnake.Color.red()
+            )
+            await inter.edit_original_response(embed=embed)
+            return
+
+        if voice_state.channel != voice_client.channel:
+            embed = disnake.Embed(
+                title="錯誤",
+                description="你和機器人需要在同一個語音頻道中使用該命令。",
+                color=disnake.Color.red()
+            )
+            await inter.edit_original_response(embed=embed)
             return
 
         async with self.lock:
@@ -126,7 +158,12 @@ class TTSCommands(commands.Cog):
                     voice_client.play(disnake.FFmpegPCMAudio(temp_audio_file_path), after=after_playing)
                     logger.info("Playing audio...")
 
-                    await inter.edit_original_response("正在播放...")
+                    embed = disnake.Embed(
+                        title="TTS 播放",
+                        description=f"正在播放: {text}",
+                        color=disnake.Color.green()
+                    )
+                    await inter.edit_original_response(embed=embed)
                     break
                 except Exception as e:
                     logger.error(f"Error fetching TTS audio: {e}")
@@ -134,7 +171,12 @@ class TTSCommands(commands.Cog):
                         logger.info(f"Retrying in {self.retry_delay} seconds...")
                         await asyncio.sleep(self.retry_delay)
                     else:
-                        await inter.edit_original_response("獲取TTS音頻時出錯。")
+                        embed = disnake.Embed(
+                            title="錯誤",
+                            description="獲取TTS音頻時出錯。",
+                            color=disnake.Color.red()
+                        )
+                        await inter.edit_original_response(embed=embed)
 
 
 def setup(bot):
