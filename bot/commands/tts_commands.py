@@ -1,10 +1,12 @@
 import disnake
+import asyncio
+import os
+import tempfile
 from disnake.ext import commands
 
 from bot import user_settings
 from bot.tts_handler import text_to_speech
 from config import GUILD_ID
-from models.audio_buffer import AudioBuffer
 from utils.logger import logger
 from utils.file_utils import load_sample_data, list_characters
 
@@ -13,7 +15,9 @@ class TTSCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.sample_data = load_sample_data()
-        self.audio_buffer = AudioBuffer()
+        self.lock = asyncio.Lock()
+        self.max_retries = 3
+        self.retry_delay = 2  # seconds
 
     @commands.slash_command(
         name="set_voice",
@@ -83,12 +87,12 @@ class TTSCommands(commands.Cog):
         settings = user_settings.get_user_settings(user_id)
         character_name = settings.get("selected_sample", "")
 
-        if character_name is None or character_name == "":
+        if not character_name:
             await inter.edit_original_response("你尚未設置語音樣本。")
             return
 
         voice_state = inter.author.voice
-        if voice_state is None or voice_state.channel is None:
+        if not voice_state or not voice_state.channel:
             embed = disnake.Embed(
                 title="錯誤",
                 description="你需要在語音頻道使用該命令。",
@@ -98,27 +102,39 @@ class TTSCommands(commands.Cog):
             return
 
         voice_client = inter.guild.voice_client
-        if voice_client is None:
+        if not voice_client:
             await inter.edit_original_response(
                 "機器人不在任何語音頻道。請先使用 `/join_voice` 命令讓機器人加入語音頻道。")
             return
 
-        try:
-            audio_data = text_to_speech(text, character_name)
+        async with self.lock:
+            for attempt in range(1, self.max_retries + 1):
+                try:
+                    logger.info(f"Fetching TTS audio (attempt {attempt})...")
+                    audio_data = text_to_speech(text, character_name)
+                    logger.info("Audio data fetched successfully")
+                    logger.info(f"Audio data length: {len(audio_data)} bytes")
 
-            print('Audio data get')
+                    with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_audio_file:
+                        temp_audio_file.write(audio_data)
+                        temp_audio_file_path = temp_audio_file.name
 
-            await self.audio_buffer.add_to_queue(audio_data)
+                    def after_playing(error):
+                        logger.info(f'Finished playing: {error}')
+                        os.remove(temp_audio_file_path)
 
-            print('Audio data added to queue')
+                    voice_client.play(disnake.FFmpegPCMAudio(temp_audio_file_path), after=after_playing)
+                    logger.info("Playing audio...")
 
-            if not voice_client.is_playing():
-                await self.audio_buffer.play_audio(voice_client)
-
-            await inter.edit_original_response("正在播放...")
-        except Exception as e:
-            logger.error(f"Error fetching TTS audio: {e}")
-            await inter.edit_original_response("獲取TTS音頻時出錯。")
+                    await inter.edit_original_response("正在播放...")
+                    break
+                except Exception as e:
+                    logger.error(f"Error fetching TTS audio: {e}")
+                    if attempt < self.max_retries:
+                        logger.info(f"Retrying in {self.retry_delay} seconds...")
+                        await asyncio.sleep(self.retry_delay)
+                    else:
+                        await inter.edit_original_response("獲取TTS音頻時出錯。")
 
 
 def setup(bot):
