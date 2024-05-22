@@ -1,8 +1,8 @@
 import requests
 import os
-
 import config
 from utils.file_utils import load_sample_data, get_samples_by_character
+from utils.logger import logger
 
 
 def text_to_speech(text: str, character: str) -> bytes:
@@ -30,16 +30,30 @@ def text_to_speech(text: str, character: str) -> bytes:
         character (str): 語音角色
     """
     sample_data = load_sample_data()
-    characters = get_samples_by_character(character, sample_data)
-    response = requests.post(config.TTS_API_URL, json={
-        "refer_wav_path": f"{os.getcwd()}/data/samples/{characters['file']}",
-        "prompt_text": characters["text"],
-        "prompt_language": "zh",
-        "text": text,
-        "text_language": "zh",
-        'character': character
-    })
-    if response.status_code == 200:
-        return response.content
-    else:
-        raise Exception(f"TTS API請求失敗: {response.status_code}, {response.text}")
+    character_content = get_samples_by_character(character, sample_data)
+
+    if not character_content:
+        raise Exception(f"角色 '{character}' 不存在")
+
+    character_sample = character_content
+
+    try:
+        logger.info("Sending TTS request...")
+        response = requests.post(config.TTS_API_URL, json={
+            "refer_wav_path": os.path.join(os.getcwd(), "data", "samples", character_sample["file"]),
+            "prompt_text": character_sample["text"],
+            "prompt_language": "zh",
+            "text": text,
+            "text_language": "zh"
+        })
+
+        response.raise_for_status()
+
+        if response.status_code == 200:
+            return response.content
+        else:
+            logger.error(f"TTS API請求失敗: {response.status_code}, {response.text}")
+            raise Exception(f"TTS API請求失敗: {response.status_code}, {response.text}")
+    except requests.exceptions.RequestException as e:
+        logger.error(f"TTS API請求異常: {e}")
+        raise Exception(f"TTS API請求異常: {e}")

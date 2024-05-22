@@ -39,7 +39,7 @@ class TTSCommands(commands.Cog):
             inter (disnake.ApplicationCommandInteraction): 交互事件
             character_name (str): 角色名稱
         """
-        await inter.response.defer()
+        await inter.response.defer(ephemeral=True)
         user_id = inter.author.id
         settings = {"selected_sample": character_name}
         user_settings.set_user_settings(user_id, settings)
@@ -58,7 +58,7 @@ class TTSCommands(commands.Cog):
         Args:
             inter (disnake.ApplicationCommandInteraction): 交互事件
         """
-        await inter.response.defer()
+        await inter.response.defer(ephemeral=True)
         user_id = inter.author.id
         settings = user_settings.get_user_settings(user_id)
         sample_name = settings.get("selected_sample", "未設置")
@@ -78,7 +78,7 @@ class TTSCommands(commands.Cog):
             inter (disnake.ApplicationCommandInteraction): 交互事件
             text (str): 要轉換為語音的文本
         """
-        await inter.response.defer()
+        await inter.response.defer(ephemeral=True)
         user_id = inter.author.id
         settings = user_settings.get_user_settings(user_id)
         character_name = settings.get("selected_sample", "")
@@ -105,7 +105,12 @@ class TTSCommands(commands.Cog):
 
         try:
             audio_data = text_to_speech(text, character_name)
+
+            print('Audio data get')
+
             await self.audio_buffer.add_to_queue(audio_data)
+
+            print('Audio data added to queue')
 
             if not voice_client.is_playing():
                 await self.audio_buffer.play_audio(voice_client)
