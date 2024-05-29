@@ -5,7 +5,7 @@ from config import GUILD_ID
 
 
 class VoiceCommands(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.slash_command(
@@ -29,7 +29,7 @@ class VoiceCommands(commands.Cog):
                 description="你需要在語音頻道使用該命令。",
                 color=disnake.Color.red()
             )
-            await inter.edit_original_message(embed=embed)
+            await inter.edit_original_response(embed=embed)
             return
 
         channel = voice_state.channel
@@ -46,7 +46,43 @@ class VoiceCommands(commands.Cog):
             color=disnake.Color.green()
         )
 
-        await inter.edit_original_message(embed=embed)
+        await inter.edit_original_response(embed=embed)
+
+    @commands.slash_command(
+        name="leave_voice",
+        guild_ids=[GUILD_ID],
+        description="讓機器人離開當前語音頻道",
+    )
+    async def leave_voice(self, inter: disnake.ApplicationCommandInteraction):
+        """
+        讓機器人離開當前語音頻道
+
+        Args:
+            inter (disnake.ApplicationCommandInteraction): 交互事件
+        """
+        await inter.response.defer(ephemeral=True)
+
+        voice_client = inter.guild.voice_client
+        if voice_client is None:
+            embed = disnake.Embed(
+                title="錯誤",
+                description="機器人不在任何語音頻道。",
+                color=disnake.Color.red()
+            )
+            await inter.edit_original_response(embed=embed)
+            return
+
+        await voice_client.disconnect()
+
+        logger.info('Bot left the voice channel')
+
+        embed = disnake.Embed(
+            title="成功",
+            description="已離開語音頻道。",
+            color=disnake.Color.green()
+        )
+
+        await inter.edit_original_response(embed=embed)
 
 
 def setup(bot):

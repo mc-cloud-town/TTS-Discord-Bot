@@ -6,7 +6,7 @@ from utils.logger import logger
 
 
 class GeneralCommands(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.slash_command(
