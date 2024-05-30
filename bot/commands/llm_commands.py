@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import disnake
 import asyncio
 import os
@@ -39,6 +41,10 @@ class LLMCommands(commands.Cog):
                 for character in list_characters(load_sample_data())
             ],
             default="可莉"
+        ),
+        image: disnake.Attachment = commands.Param(
+            description="上傳一張圖片作為問題的附加內容",
+            default=None,
         )
     ):
         """
@@ -49,10 +55,11 @@ class LLMCommands(commands.Cog):
             question (str): 用戶提問
             play_audio (bool): 是否將回覆轉成語音播放
             character_name (str): 使用角色語音名稱
+            image (disnake.Attachment): 用戶上傳的圖片（可選）
         """
         await inter.response.defer()
 
-        logger.info(f"Sending question to LLM: {question}")
+        logger.info(f"Sending question to LLM {'with image' if image is not None else ''}: {question}")
 
         embed = disnake.Embed(
             title="雲妹思考中",
@@ -62,7 +69,22 @@ class LLMCommands(commands.Cog):
 
         await inter.edit_original_response(embed=embed)
 
-        response_text, feedback = self.llm_client.send_text(question)
+        if image and not image.content_type.startswith("image"):
+            embed = disnake.Embed(
+                title="錯誤",
+                description="請上傳一張圖片。",
+                color=disnake.Color.red()
+            )
+            await inter.edit_original_response(embed=embed)
+            return
+
+        if image:
+            image_path: os.PathLike = Path(tempfile.mktemp(suffix=".png"))
+            await image.save(image_path)
+            response_text, feedback = self.llm_client.send_text_image(str(image_path), question)
+            os.remove(image_path)
+        else:
+            response_text, feedback = self.llm_client.send_text(question)
 
         if not response_text:
             embed = disnake.Embed(
@@ -80,6 +102,9 @@ class LLMCommands(commands.Cog):
             description=f"**關於你的問題**: {question}\n\n**我的回答**: {response_text}",
             color=disnake.Color.green()
         )
+
+        if image:
+            embed.set_image(url=image.url)
 
         embed.set_footer(text="該技術使用Google Gemini")
 
