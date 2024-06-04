@@ -26,7 +26,7 @@ dist-ssr
 data/samples/*.mp3
 data/samples/*.wav
 data/samples/*.ogg
-data/samples/*.mfa
+data/samples/*.m4a
 data/conversations/*.json
 
 .vite-react-ssg-temp/
