@@ -1,5 +1,8 @@
 from PIL import Image
 import google.generativeai as genai
+from google.ai.generativelanguage_v1 import Content
+from google.generativeai.types import ContentDict, GenerateContentResponse
+
 from config import ModelConfig
 
 
@@ -46,7 +49,7 @@ class GeminiAPIClient:
         )
         return model
 
-    def send_text_image(self, image_path: str, prompt: str = None) -> tuple[str, str]:
+    def get_response_from_text_image(self, image_path: str, prompt: str = None) -> tuple[str, str]:
         """
         Send the image to the API and get the prediction result.
         """
@@ -69,7 +72,7 @@ class GeminiAPIClient:
             print(f"Error during API call: {e}")
             return "", ""
 
-    def send_text(self, text: str, prompt: str = None) -> tuple[str, str]:
+    def get_response_from_text(self, text: str, prompt: str = None) -> tuple[str, str]:
         """
         Send the text to the API and get the prediction result.
         """
@@ -86,3 +89,32 @@ class GeminiAPIClient:
             # Handle unexpected errors
             print(f"Error during text prediction: {e}")
             return "", ""
+
+    def get_response_from_text_and_history(self, history: [Content | ContentDict], text: str, prompt: str = None) -> (
+        GenerateContentResponse | None
+    ):
+        """
+        Send the text history to the API and get the prediction result.
+
+        Args:
+            history: The history of the conversation.
+            text: The text to send to the API.
+            prompt: The prompt to use for the model.
+        """
+        # Use default prompt if none provided
+        if not prompt:
+            prompt = self.default_text_prompt
+
+        # If history is not provided, use the default prompt
+        if not history:
+            text = f"{prompt}\n{text}"
+
+        chat = self.model.start_chat(history=history)
+
+        try:
+            response = chat.send_message(text, stream=True)
+            return response
+        except Exception as e:
+            # Handle unexpected errors
+            print(f"Error during text prediction: {e}")
+            return None

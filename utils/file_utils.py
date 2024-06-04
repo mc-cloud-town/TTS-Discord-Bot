@@ -37,3 +37,32 @@ def list_characters(sample_data_dict: dict) -> list:
         list: 所有角色名稱
     """
     return list(sample_data_dict.keys())
+
+
+def load_user_conversation(user_id: int):
+    """
+    Load the user's conversation from the storage.
+
+    Args:
+        user_id (int): The user's ID.
+
+    Returns:
+        list: The user's conversation.
+    """
+    try:
+        with open(f'data/conversations/{user_id}.json', 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+
+
+def save_user_conversation(user_id: int, conversation: list):
+    """
+    Save the user's conversation to the storage.
+
+    Args:
+        user_id (int): The user's ID.
+        conversation (list): The user's conversation.
+    """
+    with open(f'data/conversations/{user_id}.json', 'w', encoding='utf-8') as f:
+        json.dump(conversation, f, ensure_ascii=False, indent=4)

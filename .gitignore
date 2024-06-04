@@ -26,6 +26,8 @@ dist-ssr
 data/samples/*.mp3
 data/samples/*.wav
 data/samples/*.ogg
+data/samples/*.mfa
+data/conversations/*.json
 
 .vite-react-ssg-temp/
 cache-images
