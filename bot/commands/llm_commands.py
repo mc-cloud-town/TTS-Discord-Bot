@@ -34,10 +34,10 @@ class LLMCommands(commands.Cog):
             name="問題",
             desc="提問內容",
         ),
-        play_audio: bool = commands.Param(
-            name="播放語音",
-            description="是否將回覆轉成語音播放",
-            default=False,
+        image: disnake.Attachment = commands.Param(
+            name="附件圖片",
+            description="上傳一張圖片作為問題的附加內容",
+            default=None,
         ),
         character_name: str = commands.Param(
             name="語音角色",
@@ -46,13 +46,8 @@ class LLMCommands(commands.Cog):
                 disnake.OptionChoice(name=character, value=character)
                 for character in list_characters(load_sample_data())
             ],
-            default="可莉"
-        ),
-        image: disnake.Attachment = commands.Param(
-            name="附件圖片",
-            description="上傳一張圖片作為問題的附加內容",
             default=None,
-        )
+        ),
     ):
         """
         向語言模型提問並將回覆轉成語音播放
@@ -117,7 +112,7 @@ class LLMCommands(commands.Cog):
 
         await inter.edit_original_response(embed=embed)
 
-        if not play_audio:
+        if not character_name:
             return
 
         voice_state = inter.author.voice

@@ -1,10 +1,14 @@
-import disnake
-import requests
+import io
 import os
+import re
+
+import disnake
+from pydub import AudioSegment
+import requests
+
 import config
 from utils.file_utils import load_sample_data, get_samples_by_character
 from utils.logger import logger
-import re
 
 
 def preprocess_text(text: str, message: disnake.Message = None) -> str:
@@ -17,7 +21,6 @@ def preprocess_text(text: str, message: disnake.Message = None) -> str:
     Returns:
         str: 預處理後的文本
     """
-    logger.debug(f"Preprocessing text: {text}")
 
     if message:
         # 替換提及用戶
@@ -57,9 +60,36 @@ def preprocess_text(text: str, message: disnake.Message = None) -> str:
 
     text = replace_other_chars(text)
 
-    logger.debug(f"After preprocessing: {text}")
-
     return text
+
+
+def split_text_into_chunks(text: str, chunk_size: int = 2) -> list:
+    """
+    將文本分割為多個文本塊，每個文本塊包含指定數量的句子
+    Args:
+        text (str): 要分割的文本
+        chunk_size (int): 每個文本塊包含的句子數
+
+    Returns:
+        list: 包含多個文本塊的列表
+    """
+    # 使用標點符號和換行符進行分割
+    sentences = re.split(r'([。！？!?]|\n)', text)
+    sentences = [a + b for a, b in zip(sentences[::2], sentences[1::2])]  # 合併標點符號
+
+    chunks = []
+    current_chunk = []
+
+    for sentence in sentences:
+        current_chunk.append(sentence.strip())
+        if len(current_chunk) == chunk_size:
+            chunks.append(' '.join(current_chunk))
+            current_chunk = []
+
+    if current_chunk:
+        chunks.append(' '.join(current_chunk))
+
+    return chunks
 
 
 def text_to_speech(text: str, character: str, message: disnake.Message = None) -> bytes:
@@ -89,6 +119,9 @@ def text_to_speech(text: str, character: str, message: disnake.Message = None) -
     """
     # 預處理文本
     preprocessed_text = preprocess_text(text, message)
+    chunks = split_text_into_chunks(preprocessed_text)
+
+    logger.info(f"Preprocessed text: {chunks}")
 
     sample_data = load_sample_data()
     character_content = get_samples_by_character(character, sample_data)
@@ -98,23 +131,34 @@ def text_to_speech(text: str, character: str, message: disnake.Message = None) -
 
     character_sample = character_content
 
-    try:
-        logger.info("Sending TTS request...")
-        response = requests.post(config.TTS_API_URL, json={
-            "refer_wav_path": os.path.join(os.getcwd(), "data", "samples", character_sample["file"]),
-            "prompt_text": character_sample["text"],
-            "prompt_language": "zh",
-            "text": preprocessed_text,
-            "text_language": "zh"
-        })
+    audio_segments = []
 
-        response.raise_for_status()
+    for chunk in chunks:
+        try:
+            logger.info(f"Sending TTS request for chunk: {chunk}")
+            response = requests.post(config.TTS_API_URL, json={
+                "refer_wav_path": os.path.join(os.getcwd(), "data", "samples", character_sample["file"]),
+                "prompt_text": character_sample["text"],
+                "prompt_language": "zh",
+                "text": chunk,
+                "text_language": "zh"
+            })
 
-        if response.status_code == 200:
-            return response.content
-        else:
-            logger.error(f"TTS API請求失敗: {response.status_code}, {response.text}")
-            raise Exception(f"TTS API請求失敗: {response.status_code}, {response.text}")
-    except requests.exceptions.RequestException as e:
-        logger.error(f"TTS API請求異常: {e}")
-        raise Exception(f"TTS API請求異常: {e}")
+            response.raise_for_status()
+
+            if response.status_code == 200:
+                audio_segment = AudioSegment.from_file(io.BytesIO(response.content), format="wav")
+                audio_segments.append(audio_segment)
+            else:
+                logger.error(f"TTS API請求失敗: {response.status_code}, {response.text}")
+                raise Exception(f"TTS API請求失敗: {response.status_code}, {response.text}")
+        except requests.exceptions.RequestException as e:
+            logger.error(f"TTS API請求異常: {e}")
+            raise Exception(f"TTS API請求異常: {e}")
+
+    combined_audio = sum(audio_segments, AudioSegment.empty())
+    combined_audio_bytes = io.BytesIO()
+    combined_audio.export(combined_audio_bytes, format="wav")
+    combined_audio_bytes.seek(0)
+
+    return combined_audio_bytes.read()
