@@ -237,6 +237,8 @@ class LLMCommands(commands.Cog):
                     color=disnake.Color.green()
                 )
 
+                embed.set_footer(text="該技術使用Google Gemini")
+
                 await inter.edit_original_response(embed=embed)
 
             # If history is not provided, use the default prompt

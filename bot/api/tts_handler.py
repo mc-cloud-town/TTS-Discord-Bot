@@ -1,3 +1,4 @@
+import disnake
 import requests
 import os
 import config
@@ -6,11 +7,12 @@ from utils.logger import logger
 import re
 
 
-def preprocess_text(text: str) -> str:
+def preprocess_text(text: str, message: disnake.Message = None) -> str:
     """
-    預處理文本，移除Markdown特殊字符和格式符號
+    預處理文本，移除Markdown特殊字符和格式符號，替換提及的用戶和頻道
     Args:
         text (str): 要預處理的文本
+        message: Discord消息對象，用於獲取用戶和頻道名稱
 
     Returns:
         str: 預處理後的文本
@@ -20,13 +22,35 @@ def preprocess_text(text: str) -> str:
     # 移除Markdown列表項目
     text = re.sub(r'\*', '', text)
     # 移除Markdown鏈接
-    text = re.sub(r'\[.*?\]\(.*?\)', '', text)
+    text = re.sub(r'\[.*?]\(.*?\)', '', text)
     # 移除多餘的空格和換行符
     text = text.replace('\n', ' ').strip()
+
+    if not message:
+        return text
+
+    # 替換提及用戶
+    def replace_user_mention(match):
+        user_id = int(match.group(1))
+        user = message.guild.get_member(user_id)
+
+        return f' mention {user.display_name} ' if user else match.group(0)
+
+    text = re.sub(r'<@!?(\d+)>', replace_user_mention, text)
+
+    # 替換提及頻道
+    def replace_channel_mention(match):
+        channel_id = int(match.group(1))
+        channel = message.guild.get_channel(channel_id)
+
+        return f' at channel {channel.name} ' if channel else match.group(0)
+
+    text = re.sub(r'<(\d+)>', replace_channel_mention, text)
+
     return text
 
 
-def text_to_speech(text: str, character: str) -> bytes:
+def text_to_speech(text: str, character: str, message: disnake.Message = None) -> bytes:
     """
     與TTS API互動的函數
     這個函數將文本轉換為語音。
@@ -49,9 +73,10 @@ def text_to_speech(text: str, character: str) -> bytes:
     Args:
         text (str): 要轉換的文本
         character (str): 語音角色
+        message: Discord消息對象，用於獲取用戶和頻道名稱
     """
     # 預處理文本
-    preprocessed_text = preprocess_text(text)
+    preprocessed_text = preprocess_text(text, message)
 
     sample_data = load_sample_data()
     character_content = get_samples_by_character(character, sample_data)
