@@ -75,7 +75,12 @@ def split_text_into_chunks(text: str, chunk_size: int = 2) -> list:
     """
     # 使用標點符號和換行符進行分割
     sentences = re.split(r'([。！？!?]|\n)', text)
-    sentences = [a + b for a, b in zip(sentences[::2], sentences[1::2])]  # 合併標點符號
+
+    # 處理沒有斷句標點符號
+    if len(sentences) == 1:
+        sentences = [text]
+    else:
+        sentences = [a + b for a, b in zip(sentences[::2], sentences[1::2])]
 
     chunks = []
     current_chunk = []
@@ -86,7 +91,7 @@ def split_text_into_chunks(text: str, chunk_size: int = 2) -> list:
             chunks.append(' '.join(current_chunk))
             current_chunk = []
 
-    if current_chunk:
+    if len(current_chunk) > 0:
         chunks.append(' '.join(current_chunk))
 
     return chunks
@@ -119,9 +124,8 @@ def text_to_speech(text: str, character: str, message: disnake.Message = None) -
     """
     # 預處理文本
     preprocessed_text = preprocess_text(text, message)
-    chunks = split_text_into_chunks(preprocessed_text)
 
-    logger.info(f"Preprocessed text: {chunks}")
+    chunks = split_text_into_chunks(preprocessed_text)
 
     sample_data = load_sample_data()
     character_content = get_samples_by_character(character, sample_data)
