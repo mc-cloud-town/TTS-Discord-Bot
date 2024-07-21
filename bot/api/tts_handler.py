@@ -17,35 +17,47 @@ def preprocess_text(text: str, message: disnake.Message = None) -> str:
     Returns:
         str: 預處理後的文本
     """
-    # 移除Markdown標題
-    text = re.sub(r'#*', '', text)
-    # 移除Markdown列表項目
-    text = re.sub(r'\*', '', text)
-    # 移除Markdown鏈接
-    text = re.sub(r'\[.*?]\(.*?\)', '', text)
-    # 移除多餘的空格和換行符
-    text = text.replace('\n', ' ').strip()
+    logger.debug(f"Preprocessing text: {text}")
 
-    if not message:
-        return text
+    if message:
+        # 替換提及用戶
+        def replace_user_mention(match: re.Match) -> str:
+            user_id = int(match.group(1))
+            user = message.guild.get_member(user_id)
 
-    # 替換提及用戶
-    def replace_user_mention(match):
-        user_id = int(match.group(1))
-        user = message.guild.get_member(user_id)
+            return f'，提及 {user.display_name} 用戶，' if user else match.group(0)
 
-        return f' mention {user.display_name} ' if user else match.group(0)
+        text = re.sub(r'<@!?(\d+)>', replace_user_mention, text)
 
-    text = re.sub(r'<@!?(\d+)>', replace_user_mention, text)
+        # 替換提及頻道
+        def replace_channel_mention(match: re.Match) -> str:
+            channel_id = int(match.group(1))
+            channel = message.guild.get_channel(channel_id)
 
-    # 替換提及頻道
-    def replace_channel_mention(match):
-        channel_id = int(match.group(1))
-        channel = message.guild.get_channel(channel_id)
+            return f'，在 {channel.name} 頻道中，' if channel else match.group(0)
 
-        return f' at channel {channel.name} ' if channel else match.group(0)
+        text = re.sub(r'<#(\d+)>', replace_channel_mention, text)
 
-    text = re.sub(r'<(\d+)>', replace_channel_mention, text)
+    # 移除Markdown特殊字符和格式符號
+    def replace_other_chars(t: str) -> str:
+        # 移除Markdown標題
+        t = re.sub(r'#*', '', t)
+        # 移除Markdown列表項目
+        t = re.sub(r'\*', '', t)
+        # 移除Markdown鏈接
+        t = re.sub(r'\[.*?]\(.*?\)', '', t)
+        # 移除多餘的空格和換行符
+        t = t.replace('\n', ' ').strip()
+        # 移除連結
+        t = re.sub(r'https?://\S+', '', t)
+        # 移除Discord表情符號
+        t = re.sub(r'<a?:\w+:\d+>', '', t)
+
+        return t
+
+    text = replace_other_chars(text)
+
+    logger.debug(f"After preprocessing: {text}")
 
     return text
 
