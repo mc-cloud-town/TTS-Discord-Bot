@@ -149,7 +149,7 @@ class LLMCommands(commands.Cog):
             for attempt in range(1, self.max_retries + 1):
                 try:
                     logger.info(f"Fetching TTS audio (attempt {attempt})...")
-                    text = f"雲妹回覆: {text}"
+                    response_text = f"雲妹回覆: {response_text}"
                     audio_data = text_to_speech(response_text, character_name)
                     logger.info("Audio data fetched successfully")
                     logger.info(f"Audio data length: {len(audio_data)} bytes")
