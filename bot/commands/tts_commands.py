@@ -140,6 +140,7 @@ class TTSCommands(commands.Cog):
             for attempt in range(1, self.max_retries + 1):
                 try:
                     logger.info(f"Fetching TTS audio (attempt {attempt})...")
+                    text = f"{inter.author.display_name} 說: {text}"
                     audio_data = text_to_speech(text, character_name)
                     logger.info("Audio data fetched successfully")
                     logger.info(f"Audio data length: {len(audio_data)} bytes")
