@@ -1,7 +1,8 @@
 {
     "user_settings": {
         "495903741354967041": {
-            "selected_sample": "\u8001\u7c21"
+            "selected_sample": "\u8349\u795e",
+            "tts_enabled": true
         },
         "667012201017638913": {
             "selected_sample": "\u7b26\u7384"
@@ -16,7 +17,7 @@
             "selected_sample": "\u5bb5\u5bae"
         },
         "676978235434598402": {
-            "selected_sample": "\u53ef\u8389"
+            "selected_sample": "\u8001\u7c21"
         },
         "762484891945664542": {
             "selected_sample": "\u8349\u795e"
@@ -47,6 +48,19 @@
         },
         "320730509523288086": {
             "selected_sample": "\u53ef\u8389"
+        },
+        "1048942978951041124": {
+            "selected_sample": "\u8001\u7c21"
+        },
+        "1193230992354312203": {
+            "selected_sample": "\u8001\u7c21"
+        },
+        "334662114922987520": {
+            "selected_sample": "\u8001\u7c21"
+        },
+        "522460151417012245": {
+            "selected_sample": "\u53ef\u8389",
+            "tts_enabled": true
         }
     }
 }

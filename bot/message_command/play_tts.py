@@ -28,16 +28,7 @@ class PlayTTS(commands.Cog):
         await inter.response.defer(ephemeral=True)
         user_id = inter.author.id
         settings = user_settings.get_user_settings(user_id)
-        character_name = settings.get("selected_sample", "")
-
-        if not character_name:
-            embed = disnake.Embed(
-                title="錯誤",
-                description="你尚未設置語音樣本。",
-                color=disnake.Color.red()
-            )
-            await inter.edit_original_response(embed=embed)
-            return
+        character_name = settings.get("selected_sample", "老簡")
 
         voice_state = inter.author.voice
         if not voice_state or not voice_state.channel:

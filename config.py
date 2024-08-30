@@ -201,3 +201,10 @@ class ModelConfig:
             top_p=top_p,
             max_output_tokens=max_output_tokens
         )
+
+
+TTS_TARGET_CHANNEL_ID = 933384447145943071
+MESSAGE_BOT_TARGET_USER_ID = 998254901538861157
+
+USER_SETTINGS_FILE = 'data/user_settings.json'
+REVERSE_MAPPING_FILE = 'data/game_id_to_user_id.json'

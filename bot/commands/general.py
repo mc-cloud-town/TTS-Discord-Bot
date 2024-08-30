@@ -61,5 +61,5 @@ class GeneralCommands(commands.Cog):
             await inter.followup.send("所有命令已重新加載。", ephemeral=True)
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(GeneralCommands(bot))

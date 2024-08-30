@@ -85,5 +85,5 @@ class VoiceCommands(commands.Cog):
         await inter.edit_original_response(embed=embed)
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(VoiceCommands(bot))
