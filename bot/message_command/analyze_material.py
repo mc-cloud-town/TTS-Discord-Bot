@@ -51,23 +51,24 @@ class AnalyzeMaterial(commands.Cog):
             df = pd.read_csv(file_path)
 
             # 選擇需要的欄位並計算 ShulkerBox 數量
-            df['ShulkerBox'] = df['Total'] / (27 * 64)
+            df['ShulkerBox'] = df['Total'] / (27.0 * 64.0)
             df_prepare = df[df['ShulkerBox'] > 1][['Item', 'ShulkerBox']]
+
+            preparation_steps = ""
 
             if not df_prepare.empty:
                 # 如果有材料需要多於一個 Shulker Box
-                preparation_steps = "\n".join(
-                    [f"- 項目: {row['Item']}, 需要 {int(row['ShulkerBox'])} 個 Shulker Box" for _, row in
+                preparation_steps = "## 盒裝物品" + "\n".join(
+                    [f"- 項目: {row['Item']}, 需要 {row['ShulkerBox']:.2} 個 Shulker Box" for _, row in
                      df_prepare.iterrows()]
                 )
-            else:
-                # 如果沒有材料需要多於一個 Shulker Box，取 Total 欄位最高的前 10 種材料
-                df_top10 = df[['Item', 'Total']].nlargest(10, 'Total')
-                preparation_steps = "\n".join(
-                    [f"- 項目: {row['Item']}, 需要 {int(row['Total'])} 個材料" for _, row in df_top10.iterrows()]
-                )
 
-            await inter.edit_original_response("正在使用 LLM 模型進行分析，請稍候...")
+            # 移除已經用盒子表示的材料
+            df_not_box= df[~df['Item'].isin(df_prepare['Item'])]
+
+            preparation_steps = preparation_steps + "\n\n## 散裝物品" + "\n".join(
+                [f"- 項目: {row['Item']}, 需要 {int(row['Total'])} 個材料" for _, row in df_not_box.iterrows()]
+            )
 
             # 發送資料到 LLM 模型進行分析
             response_text, feedback = self.llm_client.get_response_from_text(
@@ -85,6 +86,15 @@ class AnalyzeMaterial(commands.Cog):
             await inter.edit_original_response("分析完成！")
 
             # 返回分析結果給用戶
+            await inter.send(embed=embed)
+
+            # 附上表格計算結果
+            embed = disnake.Embed(
+                title="材料分析表",
+                description=preparation_steps,
+                color=disnake.Color.blurple()
+            )
+
             await inter.send(embed=embed)
 
             # 刪除文件

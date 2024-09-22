@@ -1,14 +1,16 @@
 {
     "user_settings": {
         "495903741354967041": {
-            "selected_sample": "\u8349\u795e",
-            "tts_enabled": true
+            "selected_sample": "\u7b26\u7384",
+            "tts_enabled": false
         },
         "667012201017638913": {
             "selected_sample": "\u7b26\u7384"
         },
         "381351386975305730": {
-            "selected_sample": "\u80e1\u6843"
+            "selected_sample": "\u80e1\u6843",
+            "game_id": "eason2005",
+            "tts_enabled": false
         },
         "302624115460931595": {
             "selected_sample": "\u53ef\u8389"
@@ -23,7 +25,9 @@
             "selected_sample": "\u8349\u795e"
         },
         "688181698822799414": {
-            "selected_sample": "\u53ef\u8389"
+            "selected_sample": "\u53ef\u8389",
+            "game_id": "monkey_Reachrs",
+            "tts_enabled": false
         },
         "880316234455982121": {
             "selected_sample": "\u90a3\u7dad\u840a\u7279"
@@ -53,12 +57,26 @@
             "selected_sample": "\u8001\u7c21"
         },
         "1193230992354312203": {
-            "selected_sample": "\u8001\u7c21"
+            "selected_sample": "\u8001\u7c21",
+            "game_id": "FlandreLed",
+            "tts_enabled": true
         },
         "334662114922987520": {
             "selected_sample": "\u8001\u7c21"
         },
         "522460151417012245": {
+            "selected_sample": "\u96f7\u96fb\u5c07\u8ecd",
+            "tts_enabled": false
+        },
+        "239932156678242304": {
+            "selected_sample": "\u80e1\u6843",
+            "tts_enabled": false
+        },
+        "525640608228966400": {
+            "selected_sample": "\u7518\u96e8",
+            "tts_enabled": false
+        },
+        "866858877928210445": {
             "selected_sample": "\u53ef\u8389",
             "tts_enabled": true
         }
