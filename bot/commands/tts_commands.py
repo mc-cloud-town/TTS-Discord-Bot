@@ -45,7 +45,8 @@ class TTSCommands(commands.Cog):
         """
         await inter.response.defer(ephemeral=True)
         user_id = inter.author.id
-        settings = {"selected_sample": character_name}
+        settings = user_settings.get_user_settings(user_id)
+        settings["selected_sample"] = character_name
         user_settings.set_user_settings(user_id, settings)
         logger.info(f'Set voice sample to {character_name} for user {inter.author}')
 
