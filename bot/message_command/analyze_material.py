@@ -58,7 +58,7 @@ class AnalyzeMaterial(commands.Cog):
 
             if not df_prepare.empty:
                 # 如果有材料需要多於一個 Shulker Box
-                preparation_steps = "## 盒裝物品" + "\n".join(
+                preparation_steps = "## 盒裝物品\n" + "\n".join(
                     [f"- 項目: {row['Item']}, 需要 {row['ShulkerBox']:.2} 個 Shulker Box" for _, row in
                      df_prepare.iterrows()]
                 )
@@ -66,7 +66,7 @@ class AnalyzeMaterial(commands.Cog):
             # 移除已經用盒子表示的材料
             df_not_box= df[~df['Item'].isin(df_prepare['Item'])]
 
-            preparation_steps = preparation_steps + "\n\n## 散裝物品" + "\n".join(
+            preparation_steps = preparation_steps + "\n\n## 散裝物品\n" + "\n".join(
                 [f"- 項目: {row['Item']}, 需要 {int(row['Total'])} 個材料" for _, row in df_not_box.iterrows()]
             )
 
