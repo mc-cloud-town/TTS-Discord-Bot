@@ -2,19 +2,35 @@ import os
 from pathlib import Path
 
 import disnake
-import numpy as np
 import pandas as pd
 from disnake.ext import commands
 
-from bot.api.gemini_api import GeminiAPIClient
-from config import ModelConfig, GUILD_ID, ANALYSIS_MATERIAL_PROMPT
+from config import GUILD_ID
 from utils.logger import logger
+
+
+def calculate_packing_type_and_quantity(total: int) -> tuple[str, float]:
+    """
+    Calculate the packing type and quantity of shulker boxes needed.
+    Args:
+        total: Total number of items
+
+    Returns:
+        tuple: Packing type and quantity
+    """
+    if total >= 9 * 64:
+        return "盒裝", total / (27.0 * 64.0)  # Full box
+    elif 3 * 64 <= total < 9 * 64:
+        return "1/3箱", total / (3 * 64)  # 1/3 box, packed in multiples of 9 stacks
+    elif 1 * 64 <= total < 3 * 64:
+        return "1/9箱", total / 64  # 1/9 box, packed in multiples of 3 stacks
+    else:
+        return "散裝", total / 64  # Less than a stack
 
 
 class AnalyzeMaterial(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.llm_client = GeminiAPIClient(model_config=ModelConfig())
 
     @commands.message_command(
         name="分析藍圖材料表",
@@ -50,43 +66,45 @@ class AnalyzeMaterial(commands.Cog):
             # 讀取CSV文件
             df = pd.read_csv(file_path)
 
-            # 選擇需要的欄位並計算 ShulkerBox 數量
-            df['ShulkerBox'] = df['Total'] / (27.0 * 64.0)
-            df_prepare = df[df['ShulkerBox'] > 1][['Item', 'ShulkerBox']]
+            # Apply the calculation to the dataframe
+            df['PackingType'], df['ShulkerBox'] = zip(*df['Total'].apply(calculate_packing_type_and_quantity))
 
+            # Generate the preparation steps Markdown
             preparation_steps = ""
 
-            if not df_prepare.empty:
-                # 如果有材料需要多於一個 Shulker Box
-                preparation_steps = "## 盒裝物品\n" + "\n".join(
-                    [f"- 項目: {row['Item']}, 需要 {row['ShulkerBox']:.2} 個 Shulker Box" for _, row in
-                     df_prepare.iterrows()]
+            # Full Box (盒裝)
+            df_boxed = df[df['PackingType'] == '盒裝']
+            if not df_boxed.empty:
+                preparation_steps += "## 盒裝物品\n" + "\n".join(
+                    [f"- 項目: {row['Item']}, 需要 {row['ShulkerBox']:.2f} 盒 (準備 {int(row['ShulkerBox']) + 1} 盒)"
+                     for _, row in df_boxed.iterrows()]
                 )
 
-            # 移除已經用盒子表示的材料
-            df_not_box= df[~df['Item'].isin(df_prepare['Item'])]
+            # 1/3 Box
+            df_one_third_box = df[df['PackingType'] == '1/3箱']
+            if not df_one_third_box.empty:
+                preparation_steps += "\n\n## 1/3盒物品\n" + "\n".join(
+                    [
+                        f"- 項目: {row['Item']}, 需要 {row['ShulkerBox'] * 3:.2f} 組 (準備 {((int(row['ShulkerBox']) // 9) + 1) * 9} 組)"
+                        for _, row in df_one_third_box.iterrows()]
+                )
 
-            preparation_steps = preparation_steps + "\n\n## 散裝物品\n" + "\n".join(
-                [f"- 項目: {row['Item']}, 需要 {int(row['Total'])} 個材料" for _, row in df_not_box.iterrows()]
-            )
+            # 1/9 Box
+            df_one_ninth_box = df[df['PackingType'] == '1/9箱']
+            if not df_one_ninth_box.empty:
+                preparation_steps += "\n\n## 1/9盒物品\n" + "\n".join(
+                    [
+                        f"- 項目: {row['Item']}, 需要 {row['ShulkerBox']:.2f} 組 (準備 {((int(row['ShulkerBox']) // 3) + 1) * 3} 組)"
+                        for _, row in df_one_ninth_box.iterrows()]
+                )
 
-            # 發送資料到 LLM 模型進行分析
-            response_text, feedback = self.llm_client.get_response_from_text(
-                prompt=ANALYSIS_MATERIAL_PROMPT,
-                text=preparation_steps
-            )
-
-            # 建構 Embed
-            embed = disnake.Embed(
-                title="材料分析結果",
-                description=response_text,
-                color=disnake.Color.blurple()
-            )
-
-            await inter.edit_original_response("分析完成！")
-
-            # 返回分析結果給用戶
-            await inter.send(embed=embed)
+            # 散裝
+            df_not_boxed = df[df['PackingType'] == '散裝']
+            if not df_not_boxed.empty:
+                preparation_steps += "\n\n## 散裝物品\n" + "\n".join(
+                    [f"- 項目: {row['Item']}, 需要 {int(row['Total'])} 個 (準備 {int(row['ShulkerBox']) + 1} 組)"
+                     for _, row in df_not_boxed.iterrows()]
+                )
 
             # 附上表格計算結果
             embed = disnake.Embed(
@@ -95,6 +113,9 @@ class AnalyzeMaterial(commands.Cog):
                 color=disnake.Color.blurple()
             )
 
+            await inter.edit_original_response("分析完成！")
+
+            # 返回分析結果給用戶
             await inter.send(embed=embed)
 
             # 刪除文件
@@ -103,6 +124,7 @@ class AnalyzeMaterial(commands.Cog):
         except Exception as e:
             logger.error(f"分析文件時出現錯誤: {e}")
             await inter.edit_original_response("分析文件時出現錯誤，請稍後重試。")
+
 
 def setup(bot: commands.Bot):
     bot.add_cog(AnalyzeMaterial(bot))
