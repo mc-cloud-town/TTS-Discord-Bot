@@ -9,6 +9,7 @@ from bot.api.tts_handler import text_to_speech
 from utils.logger import logger
 from config import TTS_TARGET_CHANNEL_ID, MESSAGE_BOT_TARGET_USER_ID
 
+
 class MessageListener(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -92,7 +93,15 @@ class MessageListener(commands.Cog):
                 for attempt in range(1, self.max_retries + 1):
                     try:
                         logger.info(f"Fetching TTS audio (attempt {attempt})...")
-                        audio_data = text_to_speech(user_message, character_name)
+                        # Remove the any (any text) the display name
+                        player_name = member.display_name.replace(
+                            re.search(r'\s\(.+?\)', member.display_name).group(),
+                            ''
+                        )
+                        audio_data = text_to_speech(
+                            f'{player_name} 說: {user_message}',
+                            character_name,
+                        )
                         logger.info("Audio data fetched successfully")
                         logger.info(f"Audio data length: {len(audio_data)} bytes")
 
@@ -115,6 +124,7 @@ class MessageListener(commands.Cog):
                         else:
                             logger.error("Failed to fetch TTS audio after multiple attempts.")
                             return
+
 
 def setup(bot: commands.Bot):
     bot.add_cog(MessageListener(bot))
