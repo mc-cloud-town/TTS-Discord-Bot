@@ -6,6 +6,7 @@ import os
 from disnake.ext import commands
 from bot import user_settings
 from bot.api.tts_handler import text_to_speech
+from bot.utils.extract_user_nickname import extract_user_nickname
 from utils.logger import logger
 from config import TTS_TARGET_CHANNEL_ID, MESSAGE_BOT_TARGET_USER_ID
 
@@ -93,11 +94,10 @@ class MessageListener(commands.Cog):
                 for attempt in range(1, self.max_retries + 1):
                     try:
                         logger.info(f"Fetching TTS audio (attempt {attempt})...")
-                        # Remove the any (any text) the display name
-                        player_name = member.display_name.replace(
-                            re.search(r'\s\(.+?\)', member.display_name).group(),
-                            ''
-                        )
+
+                        # Get the first part of the name (split by space)
+                        player_name = extract_user_nickname(member.display_name)
+
                         audio_data = text_to_speech(
                             f'{player_name} 說: {user_message}',
                             character_name,
