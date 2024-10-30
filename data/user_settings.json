@@ -2,7 +2,7 @@
     "user_settings": {
         "495903741354967041": {
             "selected_sample": "\u85ff\u85ff",
-            "tts_enabled": true,
+            "tts_enabled": false,
             "game_id": "whats2000_"
         },
         "667012201017638913": {
@@ -78,7 +78,7 @@
             "tts_enabled": false
         },
         "866858877928210445": {
-            "selected_sample": "\u7518\u96e8",
+            "selected_sample": "\u85ff\u85ff",
             "tts_enabled": true,
             "game_id": "Zero_One_015645"
         },
@@ -89,6 +89,11 @@
             "game_id": "BasedSinger5437",
             "selected_sample": "\u85ff\u85ff",
             "tts_enabled": true
+        },
+        "827887469717749760": {
+            "game_id": "DG2u_",
+            "tts_enabled": true,
+            "selected_sample": "\u85ff\u85ff"
         }
     }
 }

@@ -4,7 +4,7 @@ from os import environ
 from google.generativeai import GenerationConfig
 
 DISCORD_TOKEN = environ.get('DISCORD_TOKEN')
-TTS_API_URL = 'http://127.0.0.1:9880/'
+TTS_API_URL = 'http://127.0.0.1:9880/tts/'
 GUILD_ID = int(environ.get('GUILD_ID')) if 'GUILD_ID' in environ else 933290709589577728
 
 

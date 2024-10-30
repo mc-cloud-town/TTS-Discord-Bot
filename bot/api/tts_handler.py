@@ -106,11 +106,14 @@ def text_to_speech(text: str, character: str, message: disnake.Message = None) -
     POST localhost:9880
     Request:
         {
+            "ref_audio_path": "123.wav", // For APIv2
             "refer_wav_path": "123.wav",
             "prompt_text": "一二三。",
+            "prompt_lang": "zh", // For APIv2
             "prompt_language": "zh",
             "text": "先帝创业未半而中道崩殂，今天下三分，益州疲弊，此诚危急存亡之秋也。",
-            "text_language": "zh"
+            "text_lang": "zh", // For APIv2
+            "text_language": "zh",
         }
 
     Response:
@@ -141,11 +144,14 @@ def text_to_speech(text: str, character: str, message: disnake.Message = None) -
         try:
             logger.info(f"Sending TTS request for chunk: {chunk}")
             response = requests.post(config.TTS_API_URL, json={
+                "ref_audio_path": os.path.join(os.getcwd(), "data", "samples", character_sample["file"]),
                 "refer_wav_path": os.path.join(os.getcwd(), "data", "samples", character_sample["file"]),
                 "prompt_text": character_sample["text"],
+                "prompt_lang": "zh",
                 "prompt_language": "zh",
                 "text": chunk,
-                "text_language": "zh"
+                "text_language": "zh",
+                "text_lang": "zh",
             })
 
             response.raise_for_status()
