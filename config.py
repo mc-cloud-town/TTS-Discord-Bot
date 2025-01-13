@@ -175,7 +175,7 @@ class ModelConfig:
         Args:
             api_key (str): The API key for the model.
         """
-        self.model_name = 'gemini-pro'
+        self.model_name = 'gemini-2.0-flash-exp'
         self.default_prompt = 'Describe the image in a few words.'
         if api_key:
             self.api_key = api_key

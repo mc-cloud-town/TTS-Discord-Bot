@@ -19,7 +19,7 @@ class GeminiAPIClient:
 
     def __init__(
         self,
-        model_name='gemini-1.5-flash-latest',
+        model_name='gemini-2.0-flash-exp',
         default_image_prompt='請用簡短中文回答:',
         default_text_prompt='請用簡短中文回答:',
         model_config=None,
