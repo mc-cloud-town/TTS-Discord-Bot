@@ -63,6 +63,10 @@ class MessageListener(commands.Cog):
                 logger.info(f"TTS disabled for user: {game_username}")
                 return
 
+            # 如果是命令 !!<command> 則不執行 TTS
+            if user_message.strip().startswith("!!"):
+                return
+
             # 如果 TTS 未啟用，則不執行 TTS
             if not settings.get("tts_enabled", False):
                 logger.info(f"TTS is not enabled for user: {game_username}")
