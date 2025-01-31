@@ -170,6 +170,32 @@ class TTSCommands(commands.Cog):
                         )
                         await inter.edit_original_response(embed=embed)
 
+    @commands.slash_command(
+        name="tts_start",
+        guild_ids=[GUILD_ID],
+        description="啟用文字轉語音功能"
+    )
+    async def tts_start(self, inter: disnake.ApplicationCommandInteraction):
+        user_id = inter.author.id
+        settings = user_settings.get_user_settings(user_id)
+        settings["tts_enabled"] = True
+        user_settings.set_user_settings(user_id, settings)
+        await inter.response.send_message(f"TTS 已啟用，針對用戶：{inter.author.name}", ephemeral=True)
+        logger.info(f"TTS enabled for user: {inter.author.name}")
+
+    @commands.slash_command(
+        name="tts_stop",
+        guild_ids=[GUILD_ID],
+        description="禁用文字轉語音功能"
+    )
+    async def tts_stop(self, inter: disnake.ApplicationCommandInteraction):
+        user_id = inter.author.id
+        settings = user_settings.get_user_settings(user_id)
+        settings["tts_enabled"] = False
+        user_settings.set_user_settings(user_id, settings)
+        await inter.response.send_message(f"TTS 已禁用，針對用戶：{inter.author.name}", ephemeral=True)
+        logger.info(f"TTS disabled for user: {inter.author.name}")
+
 
 def setup(bot: commands.Bot):
     bot.add_cog(TTSCommands(bot))

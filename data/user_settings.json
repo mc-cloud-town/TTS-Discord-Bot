@@ -32,7 +32,8 @@
         },
         "880316234455982121": {
             "selected_sample": "\u937e\u96e2",
-            "game_id": "Eric_Yang"
+            "game_id": "Eric_Yang",
+            "tts_enabled": true
         },
         "574515974573785098": {
             "selected_sample": "\u80e1\u6843"
