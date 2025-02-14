@@ -82,6 +82,7 @@ class VoiceChatTextChannelListener(commands.Cog):
                     audio_data = text_to_speech(
                         f'{player_name} 說: {message.content}',
                         character_name,
+                        message,
                     )
                     logger.info("Audio data fetched successfully")
                     logger.info(f"Audio data length: {len(audio_data)} bytes")
