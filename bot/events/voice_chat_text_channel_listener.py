@@ -8,14 +8,14 @@ from disnake.ext import commands
 from bot import user_settings
 from bot.api.tts_handler import text_to_speech
 from bot.utils.extract_user_nickname import extract_user_nickname
-from config import VOICE_TEXT_INPUT_CHANNEL_ID
+from config import VOICE_TEXT_INPUT_CHANNEL_IDS
 from utils.logger import logger
 
 
 class VoiceChatTextChannelListener(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.target_channel_id = VOICE_TEXT_INPUT_CHANNEL_ID
+        self.target_channel_ids = VOICE_TEXT_INPUT_CHANNEL_IDS
         self.lock = asyncio.Lock()
         self.max_retries = 3
         self.retry_delay = 2
@@ -25,7 +25,7 @@ class VoiceChatTextChannelListener(commands.Cog):
         if message.author == self.bot.user:
             return
 
-        if message.channel.id != self.target_channel_id:
+        if message.channel.id not in self.target_channel_ids:
             return
 
         user_id = message.author.id
