@@ -1,12 +1,14 @@
 {
     "user_settings": {
         "495903741354967041": {
-            "selected_sample": "\u85ff\u85ff",
+            "selected_sample": "\u8349\u795e",
             "tts_enabled": true,
             "game_id": "whats2000_"
         },
         "667012201017638913": {
-            "selected_sample": "\u7b26\u7384"
+            "selected_sample": "\u6d41\u87a2",
+            "tts_enabled": false,
+            "game_id": "shane0411"
         },
         "381351386975305730": {
             "selected_sample": "\u80e1\u6843",
@@ -33,7 +35,7 @@
         "880316234455982121": {
             "selected_sample": "\u90a3\u7dad\u840a\u7279",
             "game_id": "Eric_Yang",
-            "tts_enabled": false
+            "tts_enabled": true
         },
         "574515974573785098": {
             "selected_sample": "\u80e1\u6843"
@@ -49,7 +51,7 @@
         },
         "726774364678127658": {
             "selected_sample": "\u96f7\u96fb\u5c07\u8ecd",
-            "tts_enabled": true
+            "tts_enabled": false
         },
         "391850863951609876": {
             "selected_sample": "\u53ef\u8389"
@@ -99,13 +101,14 @@
             "selected_sample": "\u8001\u7c21"
         },
         "1048420927009984532": {
-            "selected_sample": "\u8001\u7c21"
+            "selected_sample": "\u7b26\u7384",
+            "tts_enabled": false
         },
         "378510281250439168": {
             "selected_sample": "\u90a3\u7dad\u840a\u7279"
         },
         "875590615927230464": {
-            "selected_sample": "\u8001\u7c21",
+            "selected_sample": "\u98db\u9704",
             "game_id": "R05EN",
             "tts_enabled": true
         },
@@ -119,6 +122,17 @@
         "1264376520147730453": {
             "selected_sample": "\u8001\u7c21",
             "tts_enabled": true
+        },
+        "578134478657028096": {
+            "tts_enabled": true,
+            "selected_sample": "\u53ef\u8389"
+        },
+        "1001293207553986601": {
+            "tts_enabled": true,
+            "selected_sample": "\u90a3\u7dad\u840a\u7279"
+        },
+        "622706292980580362": {
+            "selected_sample": "\u53ef\u8389"
         }
     }
 }
