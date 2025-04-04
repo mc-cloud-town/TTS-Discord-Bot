@@ -31,6 +31,9 @@ class VoiceChatTextChannelListener(commands.Cog):
         user_id = message.author.id
         settings = user_settings.get_user_settings(user_id)
 
+        if message.content.strip() == '':
+            return
+
         if message.content.strip() == "!!tts start":
             settings["tts_enabled"] = True
             user_settings.set_user_settings(user_id, settings)

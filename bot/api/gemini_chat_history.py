@@ -1,5 +1,4 @@
-from google.ai.generativelanguage_v1 import Content
-from google.generativeai.types import ContentDict
+from google.genai.types import ContentOrDict
 
 from utils.file_utils import load_user_conversation, save_user_conversation
 
@@ -16,7 +15,7 @@ class GeminiChatHistory:
         """
         Initialize the chat history.
         """
-        self.history: [ContentDict] = []
+        self.history: list[ContentOrDict] = []
         self.user_id = user_id
 
         # Try to get the user's conversation from the json file
@@ -35,7 +34,7 @@ class GeminiChatHistory:
         """
         self.history.append({"parts": [message], "role": role})
 
-    def get_history(self) -> [ContentDict]:
+    def get_history(self) -> list[ContentOrDict]:
         """
         Get the chat history.
 

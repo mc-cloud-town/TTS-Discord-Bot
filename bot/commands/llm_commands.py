@@ -55,7 +55,6 @@ class LLMCommands(commands.Cog):
         Args:
             inter (disnake.ApplicationCommandInteraction): 交互事件
             question (str): 用戶提問
-            play_audio (bool): 是否將回覆轉成語音播放
             character_name (str): 使用角色語音名稱
             image (disnake.Attachment): 用戶上傳的圖片（可選）
         """
@@ -82,35 +81,72 @@ class LLMCommands(commands.Cog):
 
         if image:
             image_path: os.PathLike = Path(tempfile.mktemp(suffix=".png"))
+            
             await image.save(image_path)
-            response_text, feedback = self.llm_client.get_response_from_text_image(str(image_path), question)
-            os.remove(image_path)
-        else:
-            response_text, feedback = self.llm_client.get_response_from_text(question, QUESTION_PROMPT)
 
-        if not response_text:
+            response_text = self.llm_client.get_response_from_text_image(str(image_path), question).text
+
+            os.remove(image_path)
+
+            if not response_text:
+                embed = disnake.Embed(
+                    title="錯誤",
+                    description="語言模型回覆無效。",
+                    color=disnake.Color.red()
+                )
+                await inter.edit_original_response(embed=embed)
+                return
+
             embed = disnake.Embed(
-                title="錯誤",
-                description="語言模型回覆無效。",
-                color=disnake.Color.red()
+                title="雲妹回覆",
+                description=f"**關於你的問題**: {question}\n\n**我的回答**:\n{response_text}",
+                color=disnake.Color.green()
             )
+
+            embed.set_image(url=image.url)
+            embed.set_footer(text="該技術使用Google Gemini")
+
             await inter.edit_original_response(embed=embed)
-            return
+        else:
+            response = self.llm_client.get_response_from_text(question, QUESTION_PROMPT)
+
+            if not response:
+                embed = disnake.Embed(
+                    title="錯誤",
+                    description="語言模型回覆無效。",
+                    color=disnake.Color.red()
+                )
+                await inter.edit_original_response(embed=embed)
+                return
+
+            await inter.edit_original_response(embed=embed)
+
+            response_text = ''
+
+            try:
+                for chunk in response:
+                    response_text += chunk.text
+
+                    embed = disnake.Embed(
+                        title="雲妹回覆",
+                        description=f"**關於你的問題**: {question}\n\n**我的回答**:\n{response_text}",
+                        color=disnake.Color.green()
+                    )
+
+                    embed.set_footer(text="該技術使用Google Gemini")
+
+                    await inter.edit_original_response(embed=embed)
+            except Exception as e:
+                logger.error(f"Error processing response: {e}")
+                embed = disnake.Embed(
+                    title="錯誤",
+                    description="處理回覆時出錯。",
+                    color=disnake.Color.red()
+                )
+                await inter.edit_original_response(embed=embed)
+                return
 
         logger.info(f"Received response from LLM: {response_text}")
-
-        embed = disnake.Embed(
-            title="雲妹回覆",
-            description=f"**關於你的問題**: {question}\n\n**我的回答**:\n{response_text}",
-            color=disnake.Color.green()
-        )
-
-        if image:
-            embed.set_image(url=image.url)
-
-        embed.set_footer(text="該技術使用Google Gemini")
-
-        await inter.edit_original_response(embed=embed)
 
         if not character_name:
             return

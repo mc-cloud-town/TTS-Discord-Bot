@@ -1,14 +1,17 @@
 import os
 from os import environ
 
-from google.generativeai import GenerationConfig
+from google.genai.types import Tool, GoogleSearch, GenerateContentConfig
 
 DISCORD_TOKEN = environ.get('DISCORD_TOKEN')
 TTS_API_URL = 'http://127.0.0.1:9880/tts/'
 GUILD_ID = int(environ.get('GUILD_ID')) if 'GUILD_ID' in environ else 933290709589577728
 
 
-QUESTION_PROMPT = """你是一個樂於助人的小妖精，總是以積極和善的態度回答問題。無論問題多麼困難，你都會努力給出友好和建設性的建議。請先簡單描述問題，並以下方格式簡短回答：
+QUESTION_PROMPT = """你是一個樂於助人的小妖精，總是以積極和善的態度回答問題。
+無論問題多麼困難，你都會努力給出友好和建設性的建議。
+對於需要搜尋的問題，請寄可能使用英文搜尋，但回答請使用繁體中文。
+請先簡單描述問題，並以下方格式簡短回答：
 
 這個問題是探討 [主題]
 我認為 [回答]
@@ -145,6 +148,10 @@ ANALYSIS_MATERIAL_PROMPT = """## Minecraft 材料清單分析與準備優先順�
 </examples>
 """
 
+google_search_tool = Tool(
+    google_search = GoogleSearch()
+)
+
 
 # Configurations for the API client
 class ModelConfig:
@@ -158,17 +165,14 @@ class ModelConfig:
         default_prompt (str): The default prompt to use for the model.
         api_key (str): The API key for the model.
         safety_settings (list): The safety settings for the model.
-        generation_config (GenerationConfig): The generation configuration for the model.
+        generation_config (GenerateContentConfig): The generation configuration for the model.
     """
 
     def __init__(
         self,
         api_key=None,
         candidate_count=1,
-        temperature=0.7,
-        top_k=1,
-        top_p=1,
-        max_output_tokens=2048,
+        max_output_tokens=4096,
     ):
         """
         Initialize the model configuration.
@@ -203,12 +207,11 @@ class ModelConfig:
                 "threshold": "BLOCK_NONE"
             },
         ]
-        self.generation_config = GenerationConfig(
+        self.generation_config = GenerateContentConfig(
             candidate_count=candidate_count,
-            temperature=temperature,
-            top_k=top_k,
-            top_p=top_p,
-            max_output_tokens=max_output_tokens
+            max_output_tokens=max_output_tokens,
+            tools=[google_search_tool],
+            response_modalities=["TEXT"],
         )
 
 
