@@ -81,7 +81,7 @@ class LLMCommands(commands.Cog):
 
         if image:
             image_path: os.PathLike = Path(tempfile.mktemp(suffix=".png"))
-            
+
             await image.save(image_path)
 
             response_text = self.llm_client.get_response_from_text_image(str(image_path), question).text
