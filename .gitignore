@@ -27,6 +27,10 @@ data/samples/*.mp3
 data/samples/*.wav
 data/samples/*.ogg
 data/samples/*.m4a
+data/user_voice/*.mp3
+data/user_voice/*.wav
+data/user_voice/*.ogg
+data/user_voice/*.m4a
 data/conversations/*.json
 
 .vite-react-ssg-temp/

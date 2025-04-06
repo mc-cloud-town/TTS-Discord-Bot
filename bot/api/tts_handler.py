@@ -7,6 +7,7 @@ from pydub import AudioSegment
 import requests
 
 import config
+from config import USER_VOICE_SETTINGS_FILE
 from utils.file_utils import load_sample_data, get_samples_by_character
 from utils.logger import logger
 
@@ -131,7 +132,8 @@ def text_to_speech(text: str, character: str, message: disnake.Message = None) -
     chunks = split_text_into_chunks(preprocessed_text)
 
     sample_data = load_sample_data()
-    character_content = get_samples_by_character(character, sample_data)
+    user_voice_dict = load_sample_data(USER_VOICE_SETTINGS_FILE)
+    character_content = get_samples_by_character(character, sample_data, user_voice_dict)
 
     if not character_content:
         raise Exception(f"角色 '{character}' 不存在")

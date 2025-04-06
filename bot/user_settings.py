@@ -1,6 +1,6 @@
 import json
 
-from config import USER_SETTINGS_FILE, REVERSE_MAPPING_FILE
+from config import USER_SETTINGS_FILE, REVERSE_MAPPING_FILE, USER_VOICE_SETTINGS_FILE
 
 
 def get_user_settings(user_id: int) -> dict:
@@ -64,3 +64,17 @@ def get_user_id_by_game_id(game_id: str) -> int:
     with open(REVERSE_MAPPING_FILE, 'r') as f:
         game_id_to_user_id = json.load(f)
     return game_id_to_user_id.get(game_id)
+
+
+def is_user_voice_exist(user_id: int) -> bool:
+    """
+    根據用户ID獲取用戶語音
+    Args:
+        user_id: 用户ID
+
+    Returns:
+        int: 用戶語音
+    """
+    with open(USER_VOICE_SETTINGS_FILE, 'r') as f:
+        data = json.load(f)
+    return str(user_id) in data.keys()

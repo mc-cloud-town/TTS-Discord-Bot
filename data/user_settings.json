@@ -1,7 +1,7 @@
 {
     "user_settings": {
         "495903741354967041": {
-            "selected_sample": "\u8349\u795e",
+            "selected_sample": "\u85ff\u85ff",
             "tts_enabled": true,
             "game_id": "whats2000_"
         },
@@ -51,7 +51,7 @@
         },
         "726774364678127658": {
             "selected_sample": "\u96f7\u96fb\u5c07\u8ecd",
-            "tts_enabled": true
+            "tts_enabled": false
         },
         "391850863951609876": {
             "selected_sample": "\u53ef\u8389"

@@ -7,6 +7,7 @@ from disnake.ext import commands
 
 from bot import user_settings
 from bot.api.tts_handler import text_to_speech
+from bot.user_settings import is_user_voice_exist
 from bot.utils.extract_user_nickname import extract_user_nickname
 from config import VOICE_TEXT_INPUT_CHANNEL_IDS
 from utils.logger import logger
@@ -57,6 +58,14 @@ class VoiceChatTextChannelListener(commands.Cog):
 
         character_name = settings.get("selected_sample", "老簡")
 
+        if character_name == '自己聲音 (需要先上傳語音樣本）':
+            if not is_user_voice_exist(user_id):
+                return
+
+            # 當前用戶的語音樣本名稱為 "自己聲音 (需要先上傳語音樣本）"，且用戶已上傳語音樣本
+            # 使用用戶的語音樣本名稱作為角色名稱
+            character_name = str(user_id)
+
         guild = message.guild
         member = guild.get_member(user_id)
         voice_state = member.voice if member else None
@@ -83,7 +92,7 @@ class VoiceChatTextChannelListener(commands.Cog):
                     player_name = extract_user_nickname(member.display_name)
 
                     audio_data = text_to_speech(
-                        f'{player_name} 說: {message.content}',
+                        f'{player_name} 說: {message.content}' if character_name != str(user_id) else message.content,
                         character_name,
                         message,
                     )

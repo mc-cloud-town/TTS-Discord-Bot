@@ -227,4 +227,5 @@ VOICE_TEXT_INPUT_CHANNEL_IDS = [
 MESSAGE_BOT_TARGET_USER_ID = 998254901538861157
 
 USER_SETTINGS_FILE = 'data/user_settings.json'
+USER_VOICE_SETTINGS_FILE = 'data/user_voice.json'
 REVERSE_MAPPING_FILE = 'data/game_id_to_user_id.json'

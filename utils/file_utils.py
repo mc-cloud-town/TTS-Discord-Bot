@@ -14,17 +14,22 @@ def load_sample_data(file_path='data/sample_data.json'):
         return json.load(f)
 
 
-def get_samples_by_character(character_name: str, sample_data_dict: dict) -> dict:
+def get_samples_by_character(character_name: str, sample_data_dict: dict, user_voice_dict: dict) -> dict:
     """
     通過角色名稱獲取語音樣本
     Args:
         character_name: 角色名稱 
         sample_data_dict: 語音樣本數據
+        user_voice_dict: 用戶語音數據
 
     Returns:
         dict: 語音樣本
     """
-    return sample_data_dict.get(character_name, {})
+    # 合併用戶語音數據和語音樣本數據
+    merged_data = {**sample_data_dict, **user_voice_dict}
+
+    # 獲取指定角色的語音樣本
+    return merged_data.get(character_name, {})
 
 
 def list_characters(sample_data_dict: dict) -> list:

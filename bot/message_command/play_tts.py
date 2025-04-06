@@ -5,6 +5,7 @@ import tempfile
 from disnake.ext import commands
 from bot.api.tts_handler import text_to_speech
 from bot import user_settings
+from bot.user_settings import is_user_voice_exist
 from bot.utils.extract_user_nickname import extract_user_nickname
 from config import GUILD_ID
 from utils.logger import logger
@@ -29,7 +30,22 @@ class PlayTTS(commands.Cog):
         await inter.response.defer(ephemeral=True)
         user_id = inter.author.id
         settings = user_settings.get_user_settings(user_id)
+
         character_name = settings.get("selected_sample", "老簡")
+
+        if character_name == '自己聲音 (需要先上傳語音樣本）':
+            if not is_user_voice_exist(user_id):
+                embed = disnake.Embed(
+                    title="錯誤",
+                    description="請先上傳語音樣本。",
+                    color=disnake.Color.red()
+                )
+                await inter.edit_original_response(embed=embed)
+                return
+
+            # 當前用戶的語音樣本名稱為 "自己聲音 (需要先上傳語音樣本）"，且用戶已上傳語音樣本
+            # 使用用戶的語音樣本名稱作為角色名稱
+            character_name = str(user_id)
 
         voice_state = inter.author.voice
         if not voice_state or not voice_state.channel:
@@ -62,7 +78,7 @@ class PlayTTS(commands.Cog):
                 try:
                     logger.info(f"Fetching TTS audio (attempt {attempt})...")
                     player_name = extract_user_nickname(inter.author.display_name)
-                    text = f"{player_name} 說: {message.content}"
+                    text = f"{player_name} 說: {message.content}" if character_name != str(user_id) else message.content
                     audio_data = text_to_speech(text, character_name, message)
                     logger.info("Audio data fetched successfully")
                     logger.info(f"Audio data length: {len(audio_data)} bytes")
