@@ -1,7 +1,11 @@
 import os
 from os import environ
+from dotenv import load_dotenv
 
 from google.genai.types import Tool, GoogleSearch, GenerateContentConfig
+
+# Load variables from .env file if it exists
+load_dotenv()
 
 DISCORD_TOKEN = environ.get('DISCORD_TOKEN')
 TTS_API_URL = 'http://127.0.0.1:9880/tts/'

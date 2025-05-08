@@ -35,3 +35,4 @@ data/conversations/*.json
 
 .vite-react-ssg-temp/
 cache-images
+.env
