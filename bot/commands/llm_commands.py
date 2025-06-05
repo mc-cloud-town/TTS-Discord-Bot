@@ -80,7 +80,9 @@ class LLMCommands(commands.Cog):
             return
 
         if image:
-            image_path: os.PathLike = Path(tempfile.mktemp(suffix=".png"))
+            fd, temp_path = tempfile.mkstemp(suffix=".png")
+            os.close(fd)
+            image_path: os.PathLike = Path(temp_path)
 
             await image.save(image_path)
 
