@@ -49,7 +49,7 @@ class GeminiAPIClient:
         try:
             with Image.open(image_path) as image_data:
                 # Prepare and send the request to the API
-                send_content = [prompt, image_data]
+                send_content = [{"text": prompt}, image_data]
 
                 return self.client.models.generate_content(
                     model=self.model_name,

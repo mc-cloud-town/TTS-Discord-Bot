@@ -22,7 +22,14 @@ class GeminiChatHistory:
         user_conversation = load_user_conversation(user_id)
 
         if user_conversation:
-            self.history = user_conversation
+            # Convert old conversation format where parts were stored as plain
+            # strings rather than part dictionaries required by the new
+            # google-genai SDK
+            for item in user_conversation:
+                parts = item.get("parts", [])
+                if parts and isinstance(parts[0], str):
+                    item["parts"] = [{"text": p} if isinstance(p, str) else p for p in parts]
+                self.history.append(item)
 
     def add_message(self, message: str, role: str):
         """
@@ -32,7 +39,7 @@ class GeminiChatHistory:
             message (str): The message to add.
             role (str): The role of the message sender.
         """
-        self.history.append({"parts": [message], "role": role})
+        self.history.append({"parts": [{"text": message}], "role": role})
 
     def get_history(self) -> list[ContentOrDict]:
         """
