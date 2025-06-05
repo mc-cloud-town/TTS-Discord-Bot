@@ -73,7 +73,18 @@
    ```env
    DISCORD_TOKEN=your_discord_bot_token
    GUILD_ID=your_discord_guild_id
-   GEMINI_API_KEY=your_gemini_api_key
+   GOOGLE_API_KEY=your_gemini_api_key
+
+   # Optional overrides
+   TTS_API_URL=http://127.0.0.1:9880/tts/
+   TTS_TARGET_CHANNEL_ID=933384447145943071
+   VOICE_TEXT_INPUT_CHANNEL_IDS=1087044327315878020,1047857030226006016
+   VOICE_MANAGER_ROLE_ID=1003708775284342955
+   MESSAGE_BOT_TARGET_USER_ID=998254901538861157
+   VOICE_DIR=data/samples
+   USER_SETTINGS_FILE=data/user_settings.json
+   USER_VOICE_SETTINGS_FILE=data/user_voice.json
+   REVERSE_MAPPING_FILE=data/game_id_to_user_id.json
    ```
 
 4. **Set up voice samples**

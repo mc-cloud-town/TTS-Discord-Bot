@@ -13,12 +13,10 @@ from google.genai.types import Tool, GoogleSearch, GenerateContentConfig
 load_dotenv()
 
 DISCORD_TOKEN = environ.get('DISCORD_TOKEN')
-TTS_API_URL = 'http://127.0.0.1:9880/tts/'
-GUILD_ID = int(environ.get('GUILD_ID')) if 'GUILD_ID' in environ else 933290709589577728
-VOICE_MANAGER_ROLE_ID = (
-    int(environ.get("VOICE_MANAGER_ROLE_ID"))
-    if "VOICE_MANAGER_ROLE_ID" in environ
-    else 1003708775284342955
+TTS_API_URL = environ.get("TTS_API_URL", "http://127.0.0.1:9880/tts/")
+GUILD_ID = int(environ.get("GUILD_ID", 933290709589577728))
+VOICE_MANAGER_ROLE_ID = int(
+    environ.get("VOICE_MANAGER_ROLE_ID", 1003708775284342955)
 )
 LOGGER_LEVEL = logging.DEBUG
 
@@ -228,21 +226,34 @@ class ModelConfig:
         )
 
 
-TTS_TARGET_CHANNEL_ID = 933384447145943071
-VOICE_TEXT_INPUT_CHANNEL_IDS = [
-    1087044327315878020,
-    1047857030226006016,
-    1077007912213434368,
-    1087717017127223336,
-    1310566904007622707,
-    1087375214406545438
-]
-MESSAGE_BOT_TARGET_USER_ID = 998254901538861157
+TTS_TARGET_CHANNEL_ID = int(
+    environ.get('TTS_TARGET_CHANNEL_ID', 933384447145943071)
+)
+VOICE_TEXT_INPUT_CHANNEL_IDS = (
+    list(
+        map(
+            int,
+            environ.get(
+                'VOICE_TEXT_INPUT_CHANNEL_IDS',
+                '1087044327315878020,1047857030226006016,1077007912213434368,1087717017127223336,1310566904007622707,1087375214406545438',
+            ).split(',')
+        )
+    )
+)
+MESSAGE_BOT_TARGET_USER_ID = int(
+    environ.get('MESSAGE_BOT_TARGET_USER_ID', 998254901538861157)
+)
 
-USER_SETTINGS_FILE = 'data/user_settings.json'
-USER_VOICE_SETTINGS_FILE = 'data/user_voice.json'
-REVERSE_MAPPING_FILE = 'data/game_id_to_user_id.json'
-VOICE_DIR = Path('data/samples')
+USER_SETTINGS_FILE = environ.get('USER_SETTINGS_FILE', 'data/user_settings.json')
+USER_VOICE_SETTINGS_FILE = environ.get(
+    'USER_VOICE_SETTINGS_FILE',
+    'data/user_voice.json',
+)
+REVERSE_MAPPING_FILE = environ.get(
+    'REVERSE_MAPPING_FILE',
+    'data/game_id_to_user_id.json',
+)
+VOICE_DIR = Path(environ.get('VOICE_DIR', 'data/samples'))
 
 # Default voice character used when a user has not set a preference
 DEFAULT_VOICE = list_characters(load_sample_data())[0]
