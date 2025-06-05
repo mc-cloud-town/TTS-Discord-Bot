@@ -1,14 +1,13 @@
 import io
-import os
 import re
 
 import disnake
-from pydub import AudioSegment
 import requests
+from pydub import AudioSegment
 
 import config
 from config import USER_VOICE_SETTINGS_FILE
-from utils.file_utils import load_sample_data, get_samples_by_character
+from utils.file_utils import get_samples_by_character, load_sample_data
 from utils.logger import logger
 
 
@@ -29,33 +28,33 @@ def preprocess_text(text: str, message: disnake.Message = None) -> str:
             user_id = int(match.group(1))
             user = message.guild.get_member(user_id)
 
-            return f'，提及 {user.display_name} 用戶，' if user else match.group(0)
+            return f"，提及 {user.display_name} 用戶，" if user else match.group(0)
 
-        text = re.sub(r'<@!?(\d+)>', replace_user_mention, text)
+        text = re.sub(r"<@!?(\d+)>", replace_user_mention, text)
 
         # 替換提及頻道
         def replace_channel_mention(match: re.Match) -> str:
             channel_id = int(match.group(1))
             channel = message.guild.get_channel(channel_id)
 
-            return f'，在 {channel.name} 頻道中，' if channel else match.group(0)
+            return f"，在 {channel.name} 頻道中，" if channel else match.group(0)
 
-        text = re.sub(r'<#(\d+)>', replace_channel_mention, text)
+        text = re.sub(r"<#(\d+)>", replace_channel_mention, text)
 
     # 移除Markdown特殊字符和格式符號
     def replace_other_chars(t: str) -> str:
         # 移除Markdown標題
-        t = re.sub(r'#*', '', t)
+        t = re.sub(r"#*", "", t)
         # 移除Markdown列表項目
-        t = re.sub(r'\*', '', t)
+        t = re.sub(r"\*", "", t)
         # 移除Markdown鏈接
-        t = re.sub(r'\[.*?]\(.*?\)', '', t)
+        t = re.sub(r"\[.*?]\(.*?\)", "", t)
         # 移除多餘的空格和換行符
-        t = t.replace('\n', ' ').strip()
+        t = t.replace("\n", " ").strip()
         # 移除連結
-        t = re.sub(r'https?://\S+', '', t)
+        t = re.sub(r"https?://\S+", "", t)
         # 移除Discord表情符號
-        t = re.sub(r'<a?:\w+:\d+>', '', t)
+        t = re.sub(r"<a?:\w+:\d+>", "", t)
 
         return t
 
@@ -75,7 +74,7 @@ def split_text_into_chunks(text: str, chunk_size: int = 2) -> list:
         list: 包含多個文本塊的列表
     """
     # 使用標點符號和換行符進行分割
-    sentences = re.split(r'([。！？!?]|\n)', text)
+    sentences = re.split(r"([。！？!?]|\n)", text)
 
     # 處理沒有斷句標點符號
     if len(sentences) == 1:
@@ -89,11 +88,11 @@ def split_text_into_chunks(text: str, chunk_size: int = 2) -> list:
     for sentence in sentences:
         current_chunk.append(sentence.strip())
         if len(current_chunk) == chunk_size:
-            chunks.append(' '.join(current_chunk))
+            chunks.append(" ".join(current_chunk))
             current_chunk = []
 
     if len(current_chunk) > 0:
-        chunks.append(' '.join(current_chunk))
+        chunks.append(" ".join(current_chunk))
 
     return chunks
 
@@ -145,15 +144,40 @@ def text_to_speech(text: str, character: str, message: disnake.Message = None) -
     for chunk in chunks:
         try:
             logger.info(f"Sending TTS request for chunk: {chunk}")
+            # {
+            #     "ref_audio_path": config.VOICE_DIR.joinpath(character_sample["file"]).__str__(),
+            #     "refer_wav_path": config.VOICE_DIR.joinpath(character_sample["file"]).__str__(),
+            #     "prompt_text": character_sample["text"],
+            #     "prompt_lang": "zh",
+            #     "prompt_language": "zh",
+            #     "text": chunk,
+            #     "text_language": "zh",
+            #     "text_lang": "zh",
+            # }
+            audio = str(config.VOICE_DIR.joinpath(character_sample["file"]))
             data = {
-                "ref_audio_path": config.VOICE_DIR.joinpath(character_sample["file"]).__str__(),
-                "refer_wav_path": config.VOICE_DIR.joinpath(character_sample["file"]).__str__(),
-                "prompt_text": character_sample["text"],
-                "prompt_lang": "zh",
-                "prompt_language": "zh",
                 "text": chunk,
-                "text_language": "zh",
                 "text_lang": "zh",
+                "ref_audio_path": audio,
+                "aux_ref_audio_paths": [audio],
+                "prompt_lang": "zh",
+                "prompt_text": character_sample["text"],
+                "top_k": 5,
+                "top_p": 1,
+                "temperature": 1,
+                "text_split_method": "cut5",
+                "batch_size": 1,
+                "batch_threshold": 0.75,
+                "split_bucket": True,
+                "speed_factor": 1,
+                "fragment_interval": 0.3,
+                "seed": -1,
+                "media_type": "wav",
+                "streaming_mode": False,
+                "parallel_infer": True,
+                "repetition_penalty": 1.35,
+                "sample_steps": 32,
+                "super_sampling": False,
             }
             logger.info(data)
             response = requests.post(config.TTS_API_URL, json=data)
