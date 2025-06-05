@@ -5,6 +5,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+from utils.file_utils import list_characters, load_sample_data
+
 from google.genai.types import Tool, GoogleSearch, GenerateContentConfig
 
 # Load variables from .env file if it exists
@@ -236,3 +238,6 @@ USER_SETTINGS_FILE = 'data/user_settings.json'
 USER_VOICE_SETTINGS_FILE = 'data/user_voice.json'
 REVERSE_MAPPING_FILE = 'data/game_id_to_user_id.json'
 VOICE_DIR = Path(os.getcwd()).joinpath("data").joinpath("samples")
+
+# Default voice character used when a user has not set a preference
+DEFAULT_VOICE = list_characters(load_sample_data())[0]

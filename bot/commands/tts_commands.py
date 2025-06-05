@@ -9,7 +9,7 @@ from bot import user_settings
 from bot.api.tts_handler import text_to_speech
 from bot.user_settings import is_user_voice_exist
 from bot.utils.extract_user_nickname import extract_user_nickname
-from config import GUILD_ID
+from config import GUILD_ID, DEFAULT_VOICE
 from utils.file_utils import list_characters, load_sample_data
 from utils.logger import logger
 
@@ -106,7 +106,7 @@ class TTSCommands(commands.Cog):
         await inter.response.defer(ephemeral=True)
         user_id = inter.author.id
         settings = user_settings.get_user_settings(user_id)
-        character_name = settings.get("selected_sample", "老簡")
+        character_name = settings.get("selected_sample", DEFAULT_VOICE)
 
         if character_name == "自己聲音 (需要先上傳語音樣本）":
             if not is_user_voice_exist(user_id):
