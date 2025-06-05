@@ -2,17 +2,19 @@ import os
 import logging
 import logging.handlers
 
+from config import LOGGER_LEVEL
+
 
 def setup_logger():
     """
     設置全局日誌記錄器
     """
     bot_logger = logging.getLogger('TTSBot')
-    bot_logger.setLevel(logging.DEBUG)
+    bot_logger.setLevel(LOGGER_LEVEL)
 
     # 創建處理器 - 控制台處理器
     console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.DEBUG)
+    console_handler.setLevel(LOGGER_LEVEL)
 
     # 創建處理器 - 文件處理器
     file_handler = logging.handlers.RotatingFileHandler(
