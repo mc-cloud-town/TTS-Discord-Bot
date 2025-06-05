@@ -22,6 +22,13 @@ class TTSCommands(commands.Cog):
         self.max_retries = 3
         self.retry_delay = 2
 
+        if not disnake.opus.is_loaded():
+            logger.info("Loading opus...")
+            if os.name == "nt":
+                disnake.opus.load_opus("libopus-0.dll")
+            else:
+                disnake.opus.load_opus("/usr/lib/libopus.so.***")
+
     @commands.slash_command(
         name="set_voice",
         guild_ids=[GUILD_ID],
