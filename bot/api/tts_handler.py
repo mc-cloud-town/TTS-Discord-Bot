@@ -2,6 +2,8 @@ import io
 import re
 
 import disnake
+# 在主模塊或配置文件中添加
+import pydub.utils
 import requests
 from pydub import AudioSegment
 
@@ -9,6 +11,16 @@ import config
 from config import USER_VOICE_SETTINGS_FILE
 from utils.file_utils import get_samples_by_character, load_sample_data
 from utils.logger import logger
+
+original_get_encoder = pydub.utils.get_encoder_name
+
+
+def custom_get_encoder_name():
+    encoder = original_get_encoder()
+    return [encoder, "-loglevel", "error"]
+
+
+pydub.utils.get_encoder_name = custom_get_encoder_name
 
 
 def preprocess_text(text: str, message: disnake.Message = None) -> str:
