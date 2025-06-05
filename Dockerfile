@@ -9,6 +9,7 @@ COPY . .
 
 RUN apk update && apk add --no-cache \
   ffmpeg \
+  opus-dev \
   libsndfile
 
 ENV PYTHONUNBUFFERED=1
