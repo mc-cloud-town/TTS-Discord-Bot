@@ -1,5 +1,7 @@
 import os
 from os import environ
+from pathlib import Path
+
 from dotenv import load_dotenv
 
 from google.genai.types import Tool, GoogleSearch, GenerateContentConfig
@@ -231,4 +233,4 @@ MESSAGE_BOT_TARGET_USER_ID = 998254901538861157
 USER_SETTINGS_FILE = 'data/user_settings.json'
 USER_VOICE_SETTINGS_FILE = 'data/user_voice.json'
 REVERSE_MAPPING_FILE = 'data/game_id_to_user_id.json'
-VOICE_DIR = os.path.join(os.getcwd(), "data", "samples")
+VOICE_DIR = Path(os.getcwd()).joinpath("data").joinpath("samples")

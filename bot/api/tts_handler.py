@@ -146,8 +146,8 @@ def text_to_speech(text: str, character: str, message: disnake.Message = None) -
         try:
             logger.info(f"Sending TTS request for chunk: {chunk}")
             data = {
-                "ref_audio_path": os.path.join(config.VOICE_DIR, character_sample["file"]),
-                "refer_wav_path": os.path.join(config.VOICE_DIR, character_sample["file"]),
+                "ref_audio_path": config.VOICE_DIR.joinpath(character_sample["file"]).__str__(),
+                "refer_wav_path": config.VOICE_DIR.joinpath(character_sample["file"]).__str__(),
                 "prompt_text": character_sample["text"],
                 "prompt_lang": "zh",
                 "prompt_language": "zh",
@@ -155,6 +155,7 @@ def text_to_speech(text: str, character: str, message: disnake.Message = None) -
                 "text_language": "zh",
                 "text_lang": "zh",
             }
+            logger.info(data)
             response = requests.post(config.TTS_API_URL, json=data)
             response.raise_for_status()
 
@@ -162,7 +163,7 @@ def text_to_speech(text: str, character: str, message: disnake.Message = None) -
                 audio_segment = AudioSegment.from_file(io.BytesIO(response.content), format="wav")
                 audio_segments.append(audio_segment)
             else:
-                logger.error(f"TTS API請求失敗: {response.status_code}, {response.text}, json: {data}")
+                logger.error(f"TTS API請求失敗: {response.status_code}, {response.text}")
                 raise Exception(f"TTS API請求失敗: {response.status_code}, {response.text}")
         except requests.exceptions.RequestException as e:
             logger.error(f"TTS API請求異常: {e}")
