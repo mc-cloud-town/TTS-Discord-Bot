@@ -1,7 +1,8 @@
-import disnake
 import asyncio
 import os
 import tempfile
+
+import disnake
 from disnake.ext import commands
 
 from bot import user_settings
@@ -9,8 +10,8 @@ from bot.api.tts_handler import text_to_speech
 from bot.user_settings import is_user_voice_exist
 from bot.utils.extract_user_nickname import extract_user_nickname
 from config import GUILD_ID
+from utils.file_utils import list_characters, load_sample_data
 from utils.logger import logger
-from utils.file_utils import load_sample_data, list_characters
 
 
 class TTSCommands(commands.Cog):
@@ -35,8 +36,8 @@ class TTSCommands(commands.Cog):
             choices=[
                 disnake.OptionChoice(name=character, value=character)
                 for character in (list_characters(load_sample_data()) + ["自己聲音 (需要先上傳語音樣本）"])
-            ]
-        )
+            ],
+        ),
     ):
         """
         設置用戶的語音樣本
@@ -50,12 +51,10 @@ class TTSCommands(commands.Cog):
         settings = user_settings.get_user_settings(user_id)
         settings["selected_sample"] = character_name
         user_settings.set_user_settings(user_id, settings)
-        logger.info(f'Set voice sample to {character_name} for user {inter.author}')
+        logger.info(f"Set voice sample to {character_name} for user {inter.author}")
 
         embed = disnake.Embed(
-            title="語音樣本",
-            description=f"語音樣本設置為 {character_name}",
-            color=disnake.Color.green()
+            title="語音樣本", description=f"語音樣本設置為 {character_name}", color=disnake.Color.green()
         )
 
         await inter.edit_original_response(embed=embed)
@@ -76,12 +75,10 @@ class TTSCommands(commands.Cog):
         user_id = inter.author.id
         settings = user_settings.get_user_settings(user_id)
         sample_name = settings.get("selected_sample", "未設置")
-        logger.info(f'Get voice sample for user {inter.author}')
+        logger.info(f"Get voice sample for user {inter.author}")
 
         embed = disnake.Embed(
-            title="語音樣本",
-            description=f"你當前的語音樣本是 {sample_name}",
-            color=disnake.Color.green()
+            title="語音樣本", description=f"你當前的語音樣本是 {sample_name}", color=disnake.Color.green()
         )
 
         await inter.edit_original_response(embed=embed)
@@ -104,12 +101,10 @@ class TTSCommands(commands.Cog):
         settings = user_settings.get_user_settings(user_id)
         character_name = settings.get("selected_sample", "老簡")
 
-        if character_name == '自己聲音 (需要先上傳語音樣本）':
+        if character_name == "自己聲音 (需要先上傳語音樣本）":
             if not is_user_voice_exist(user_id):
                 embed = disnake.Embed(
-                    title="錯誤",
-                    description="請先上傳語音樣本。",
-                    color=disnake.Color.red()
+                    title="錯誤", description="請先上傳語音樣本。", color=disnake.Color.red()
                 )
                 await inter.edit_original_response(embed=embed)
                 return
@@ -121,9 +116,7 @@ class TTSCommands(commands.Cog):
         voice_state = inter.author.voice
         if not voice_state or not voice_state.channel:
             embed = disnake.Embed(
-                title="錯誤",
-                description="你需要在語音頻道使用該命令。",
-                color=disnake.Color.red()
+                title="錯誤", description="你需要在語音頻道使用該命令。", color=disnake.Color.red()
             )
             await inter.edit_original_response(embed=embed)
             return
@@ -139,7 +132,7 @@ class TTSCommands(commands.Cog):
             embed = disnake.Embed(
                 title="錯誤",
                 description="你和機器人需要在同一個語音頻道中使用該命令。",
-                color=disnake.Color.red()
+                color=disnake.Color.red(),
             )
             await inter.edit_original_response(embed=embed)
             return
@@ -157,25 +150,25 @@ class TTSCommands(commands.Cog):
                     logger.info("Audio data fetched successfully")
                     logger.info(f"Audio data length: {len(audio_data)} bytes")
 
-                    with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_audio_file:
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio_file:
                         temp_audio_file.write(audio_data)
                         temp_audio_file_path = temp_audio_file.name
 
                     def after_playing(error):
-                        logger.info(f'Finished playing: {error}')
+                        logger.info(f"Finished playing: {error}")
                         os.remove(temp_audio_file_path)
 
                     voice_client.play(disnake.FFmpegPCMAudio(temp_audio_file_path), after=after_playing)
                     logger.info("Playing audio...")
 
                     embed = disnake.Embed(
-                        title="TTS 播放",
-                        description=f"正在播放: {text}",
-                        color=disnake.Color.green()
+                        title="TTS 播放", description=f"正在播放: {text}", color=disnake.Color.green()
                     )
                     await inter.edit_original_response(embed=embed)
                     break
                 except Exception as e:
+                    logger.debug(type(e))
+                    logger.debug(type(e).__name__)
                     logger.error(f"Error fetching TTS audio: {e}")
                     if attempt < self.max_retries:
                         logger.info(f"Retrying in {self.retry_delay} seconds...")
@@ -184,15 +177,11 @@ class TTSCommands(commands.Cog):
                         embed = disnake.Embed(
                             title="錯誤",
                             description="獲取TTS音頻時出錯。",
-                            color=disnake.Color.red()
+                            color=disnake.Color.red(),
                         )
                         await inter.edit_original_response(embed=embed)
 
-    @commands.slash_command(
-        name="tts_start",
-        guild_ids=[GUILD_ID],
-        description="啟用文字轉語音功能"
-    )
+    @commands.slash_command(name="tts_start", guild_ids=[GUILD_ID], description="啟用文字轉語音功能")
     async def tts_start(self, inter: disnake.ApplicationCommandInteraction):
         user_id = inter.author.id
         settings = user_settings.get_user_settings(user_id)
@@ -201,11 +190,7 @@ class TTSCommands(commands.Cog):
         await inter.response.send_message(f"TTS 已啟用，針對用戶：{inter.author.name}", ephemeral=True)
         logger.info(f"TTS enabled for user: {inter.author.name}")
 
-    @commands.slash_command(
-        name="tts_stop",
-        guild_ids=[GUILD_ID],
-        description="禁用文字轉語音功能"
-    )
+    @commands.slash_command(name="tts_stop", guild_ids=[GUILD_ID], description="禁用文字轉語音功能")
     async def tts_stop(self, inter: disnake.ApplicationCommandInteraction):
         user_id = inter.author.id
         settings = user_settings.get_user_settings(user_id)
