@@ -77,3 +77,46 @@ def save_user_conversation(user_id: int, conversation: list):
     """
     with open(f"data/conversations/{user_id}.json", "w", encoding="utf-8") as f:
         json.dump(conversation, f, ensure_ascii=False, indent=4)
+
+
+def save_sample_data(data: dict, file_path: str = "data/sample_data.json") -> None:
+    """保存語音樣本數據到文件"""
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+
+
+def add_character(name: str, filename: str, text: str, file_path: str = "data/sample_data.json") -> None:
+    """新增語音角色"""
+    data = load_sample_data(file_path)
+    if name in data:
+        raise ValueError("character already exists")
+    data[name] = {"file": filename, "text": text}
+    save_sample_data(data, file_path)
+
+
+def remove_character(name: str, file_path: str = "data/sample_data.json") -> dict:
+    """刪除語音角色並返回其內容"""
+    data = load_sample_data(file_path)
+    if name not in data:
+        raise ValueError("character not found")
+    entry = data.pop(name)
+    save_sample_data(data, file_path)
+    return entry
+
+
+def edit_character(
+    name: str,
+    *,
+    filename: str | None = None,
+    text: str | None = None,
+    file_path: str = "data/sample_data.json",
+) -> None:
+    """編輯語音角色信息"""
+    data = load_sample_data(file_path)
+    if name not in data:
+        raise ValueError("character not found")
+    if filename:
+        data[name]["file"] = filename
+    if text:
+        data[name]["text"] = text
+    save_sample_data(data, file_path)
