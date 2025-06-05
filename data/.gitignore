@@ -8,3 +8,4 @@ user_voice/*.wav
 user_voice/*.ogg
 user_voice/*.m4a
 conversations/*.json
+*.json
