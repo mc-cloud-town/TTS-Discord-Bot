@@ -1,7 +1,7 @@
 import json
 
 
-def load_sample_data(file_path='data/sample_data.json'):
+def load_sample_data(file_path="data/sample_data.json"):
     """
     載入語音樣本數據
     Args:
@@ -10,7 +10,7 @@ def load_sample_data(file_path='data/sample_data.json'):
     Returns:
         dict: 語音樣本數據
     """
-    with open(file_path, 'r', encoding='utf-8') as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -18,7 +18,7 @@ def get_samples_by_character(character_name: str, sample_data_dict: dict, user_v
     """
     通過角色名稱獲取語音樣本
     Args:
-        character_name: 角色名稱 
+        character_name: 角色名稱
         sample_data_dict: 語音樣本數據
         user_voice_dict: 用戶語音數據
 
@@ -55,7 +55,7 @@ def load_user_conversation(user_id: int):
         list: The user's conversation.
     """
     try:
-        with open(f'data/conversations/{user_id}.json', 'r', encoding='utf-8') as f:
+        with open(f"data/conversations/{user_id}.json", "r", encoding="utf-8") as f:
             return json.load(f)
     except FileNotFoundError:
         return []
@@ -69,5 +69,5 @@ def save_user_conversation(user_id: int, conversation: list):
         user_id (int): The user's ID.
         conversation (list): The user's conversation.
     """
-    with open(f'data/conversations/{user_id}.json', 'w', encoding='utf-8') as f:
+    with open(f"data/conversations/{user_id}.json", "w", encoding="utf-8") as f:
         json.dump(conversation, f, ensure_ascii=False, indent=4)

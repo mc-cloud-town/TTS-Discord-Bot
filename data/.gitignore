@@ -1,0 +1,10 @@
+# Audio/data files
+samples/*.mp3
+samples/*.wav
+samples/*.ogg
+samples/*.m4a
+user_voice/*.mp3
+user_voice/*.wav
+user_voice/*.ogg
+user_voice/*.m4a
+conversations/*.json
