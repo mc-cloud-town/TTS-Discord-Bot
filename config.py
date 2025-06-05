@@ -242,7 +242,7 @@ MESSAGE_BOT_TARGET_USER_ID = 998254901538861157
 USER_SETTINGS_FILE = 'data/user_settings.json'
 USER_VOICE_SETTINGS_FILE = 'data/user_voice.json'
 REVERSE_MAPPING_FILE = 'data/game_id_to_user_id.json'
-VOICE_DIR = Path(os.getcwd()).joinpath("data").joinpath("samples")
+VOICE_DIR = Path('data/samples')
 
 # Default voice character used when a user has not set a preference
 DEFAULT_VOICE = list_characters(load_sample_data())[0]
