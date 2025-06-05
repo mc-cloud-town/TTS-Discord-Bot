@@ -56,7 +56,13 @@ def load_user_conversation(user_id: int):
     """
     try:
         with open(f"data/conversations/{user_id}.json", "r", encoding="utf-8") as f:
-            return json.load(f)
+            conversation = json.load(f)
+            # Convert legacy format where parts were stored as plain strings
+            for item in conversation:
+                parts = item.get("parts", [])
+                if parts and isinstance(parts[0], str):
+                    item["parts"] = [{"text": p} if isinstance(p, str) else p for p in parts]
+            return conversation
     except FileNotFoundError:
         return []
 
