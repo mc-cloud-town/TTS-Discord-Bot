@@ -1,8 +1,10 @@
 import os
+from pathlib import Path
+
 import disnake
 from disnake.ext import commands
 
-from config import GUILD_ID, VOICE_DIR, VOICE_MANAGER_ROLE_ID
+from config import GUILD_ID, DOWNLOAD_DIR, VOICE_MANAGER_ROLE_ID
 from utils.logger import logger
 from utils.file_utils import (
     load_sample_data,
@@ -47,7 +49,7 @@ class VoiceManager(commands.Cog):
             await inter.edit_original_response(embed=embed)
             return
 
-        dest_path = VOICE_DIR.joinpath(audio.filename)
+        dest_path = Path(DOWNLOAD_DIR).joinpath(audio.filename)
         await audio.save(dest_path)
         try:
             add_character(character_name, audio.filename, reference_text)
@@ -89,7 +91,7 @@ class VoiceManager(commands.Cog):
         await inter.response.defer(ephemeral=True)
         try:
             entry = remove_character(character_name)
-            file_path = VOICE_DIR.joinpath(entry["file"])
+            file_path = Path(DOWNLOAD_DIR).joinpath(entry["file"])
             if file_path.exists():
                 file_path.unlink()
             embed = disnake.Embed(
@@ -141,7 +143,7 @@ class VoiceManager(commands.Cog):
                 )
                 await inter.edit_original_response(embed=embed)
                 return
-            dest_path = VOICE_DIR.joinpath(audio.filename)
+            dest_path = Path(DOWNLOAD_DIR).joinpath(audio.filename)
             await audio.save(dest_path)
             filename = audio.filename
 
@@ -155,7 +157,7 @@ class VoiceManager(commands.Cog):
             logger.info(f"Edited voice character {character_name}")
         except ValueError:
             if filename:
-                VOICE_DIR.joinpath(filename).unlink(missing_ok=True)
+                Path(DOWNLOAD_DIR).joinpath(filename).unlink(missing_ok=True)
             embed = disnake.Embed(
                 title="錯誤",
                 description="角色不存在。",

@@ -1,5 +1,6 @@
 import io
 import re
+from pathlib import Path
 
 import disnake
 
@@ -8,8 +9,7 @@ import pydub.utils
 import requests
 from pydub import AudioSegment
 
-import config
-from config import USER_VOICE_SETTINGS_FILE
+from config import USER_VOICE_SETTINGS_FILE, VOICE_DIR, TTS_API_URL
 from utils.file_utils import get_samples_by_character, load_sample_data
 from utils.logger import logger
 
@@ -167,7 +167,7 @@ def text_to_speech(text: str, character: str, message: disnake.Message = None) -
             #     "text_language": "zh",
             #     "text_lang": "zh",
             # }
-            audio = str(config.VOICE_DIR.joinpath(character_sample["file"]).as_posix())
+            audio = str(Path(VOICE_DIR).joinpath(character_sample["file"]).as_posix())
             data = {
                 "text": chunk,
                 "text_lang": "zh",
@@ -193,7 +193,7 @@ def text_to_speech(text: str, character: str, message: disnake.Message = None) -
                 "super_sampling": False,
             }
             logger.info(data)
-            response = requests.post(config.TTS_API_URL, json=data)
+            response = requests.post(TTS_API_URL, json=data)
             response.raise_for_status()
 
             if response.status_code == 200:

@@ -1,13 +1,10 @@
 import logging
-import os
 from os import environ
-from pathlib import Path
 
 from dotenv import load_dotenv
+from google.genai.types import Tool, GoogleSearch, GenerateContentConfig
 
 from utils.file_utils import list_characters, load_sample_data
-
-from google.genai.types import Tool, GoogleSearch, GenerateContentConfig
 
 # Load variables from .env file if it exists
 load_dotenv()
@@ -15,10 +12,23 @@ load_dotenv()
 DISCORD_TOKEN = environ.get('DISCORD_TOKEN')
 TTS_API_URL = environ.get("TTS_API_URL", "http://127.0.0.1:9880/tts/")
 GUILD_ID = int(environ.get("GUILD_ID", 933290709589577728))
-VOICE_MANAGER_ROLE_ID = int(
-    environ.get("VOICE_MANAGER_ROLE_ID", 1003708775284342955)
-)
 LOGGER_LEVEL = logging.DEBUG
+# ID
+VOICE_MANAGER_ROLE_ID = int(environ.get("VOICE_MANAGER_ROLE_ID", 1003708775284342955))
+TTS_TARGET_CHANNEL_ID = int(environ.get('TTS_TARGET_CHANNEL_ID', 933384447145943071))
+VOICE_TEXT_INPUT_CHANNEL_IDS = (list(map(int, environ.get(
+    'VOICE_TEXT_INPUT_CHANNEL_IDS',
+    '1087044327315878020,1047857030226006016,1077007912213434368,'
+    '1087717017127223336,1310566904007622707,1087375214406545438',
+).split(','))))
+MESSAGE_BOT_TARGET_USER_ID = int(environ.get('MESSAGE_BOT_TARGET_USER_ID', 998254901538861157))
+DEFAULT_VOICE = list_characters(load_sample_data())[0]
+# PATH
+USER_SETTINGS_FILE = environ.get('USER_SETTINGS_FILE', 'data/user_settings.json')
+USER_VOICE_SETTINGS_FILE = environ.get('USER_VOICE_SETTINGS_FILE', 'data/user_voice.json', )
+REVERSE_MAPPING_FILE = environ.get('REVERSE_MAPPING_FILE', 'data/game_id_to_user_id.json', )
+VOICE_DIR = environ.get('VOICE_DIR', 'data/samples')
+DOWNLOAD_DIR = environ.get('DOWNLOAD_DIR', 'data/samples')
 
 QUESTION_PROMPT = """你是一個樂於助人的小妖精，總是以積極和善的態度回答問題。
 無論問題多麼困難，你都會努力給出友好和建設性的建議。
@@ -158,9 +168,7 @@ ANALYSIS_MATERIAL_PROMPT = """## Minecraft 材料清單分析與準備優先順�
 </examples>
 """
 
-google_search_tool = Tool(
-    google_search=GoogleSearch()
-)
+google_search_tool = Tool(google_search=GoogleSearch())
 
 
 # Configurations for the API client
@@ -178,12 +186,7 @@ class ModelConfig:
         generation_config (GenerateContentConfig): The generation configuration for the model.
     """
 
-    def __init__(
-        self,
-        api_key=None,
-        candidate_count=1,
-        max_output_tokens=4096,
-    ):
+    def __init__(self, api_key=None, candidate_count=1, max_output_tokens=4096, ):
         """
         Initialize the model configuration.
         Args:
@@ -191,15 +194,7 @@ class ModelConfig:
         """
         self.model_name = 'gemini-2.0-flash-exp'
         self.default_prompt = 'Describe the image in a few words.'
-        if api_key:
-            self.api_key = api_key
-        elif 'GOOGLE_API_KEY' in os.environ:
-            self.api_key = os.environ['GOOGLE_API_KEY']
-        else:
-            raise ValueError(
-                "API key not provided. Either config a environment variable 'GOOGLE_API_KEY' or pass it "
-                "as an argument 'api_key'.")
-
+        self.api_key = api_key if api_key else environ.get('GOOGLE_API_KEY')
         self.safety_settings = [
             {
                 "category": "HARM_CATEGORY_HARASSMENT",
@@ -224,36 +219,3 @@ class ModelConfig:
             tools=[google_search_tool],
             response_modalities=["TEXT"],
         )
-
-
-TTS_TARGET_CHANNEL_ID = int(
-    environ.get('TTS_TARGET_CHANNEL_ID', 933384447145943071)
-)
-VOICE_TEXT_INPUT_CHANNEL_IDS = (
-    list(
-        map(
-            int,
-            environ.get(
-                'VOICE_TEXT_INPUT_CHANNEL_IDS',
-                '1087044327315878020,1047857030226006016,1077007912213434368,1087717017127223336,1310566904007622707,1087375214406545438',
-            ).split(',')
-        )
-    )
-)
-MESSAGE_BOT_TARGET_USER_ID = int(
-    environ.get('MESSAGE_BOT_TARGET_USER_ID', 998254901538861157)
-)
-
-USER_SETTINGS_FILE = environ.get('USER_SETTINGS_FILE', 'data/user_settings.json')
-USER_VOICE_SETTINGS_FILE = environ.get(
-    'USER_VOICE_SETTINGS_FILE',
-    'data/user_voice.json',
-)
-REVERSE_MAPPING_FILE = environ.get(
-    'REVERSE_MAPPING_FILE',
-    'data/game_id_to_user_id.json',
-)
-VOICE_DIR = Path(environ.get('VOICE_DIR', 'data/samples'))
-
-# Default voice character used when a user has not set a preference
-DEFAULT_VOICE = list_characters(load_sample_data())[0]
