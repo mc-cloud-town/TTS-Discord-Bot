@@ -2,6 +2,7 @@ import io
 import re
 
 import disnake
+
 # 在主模塊或配置文件中添加
 import pydub.utils
 import requests
@@ -166,7 +167,7 @@ def text_to_speech(text: str, character: str, message: disnake.Message = None) -
             #     "text_language": "zh",
             #     "text_lang": "zh",
             # }
-            audio = str(config.VOICE_DIR.joinpath(character_sample["file"]))
+            audio = str(config.VOICE_DIR.joinpath(character_sample["file"]).as_posix())
             data = {
                 "text": chunk,
                 "text_lang": "zh",
