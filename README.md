@@ -35,6 +35,9 @@
 - `/leave_voice` - Make the bot leave the current voice channel
 - `/tts_start` - Enable TTS functionality
 - `/tts_stop` - Disable TTS functionality
+- `/voice_add` - Add a new voice character (requires manager role)
+- `/voice_remove` - Remove an existing voice character
+- `/voice_edit` - Edit a voice character's audio or reference text
 
 #### Text Commands
 - `!!tts start` - Enable automatic TTS for your messages
@@ -131,6 +134,7 @@ Add new voice characters by:
      }
    }
    ```
+You can also manage voices in Discord using `/voice_add`, `/voice_remove` and `/voice_edit` (requires the manager role).
 
 ### Channel Configuration
 Configure target channels in `config.py`:
