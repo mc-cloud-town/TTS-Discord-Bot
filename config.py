@@ -11,7 +11,6 @@ DISCORD_TOKEN = environ.get('DISCORD_TOKEN')
 TTS_API_URL = 'http://127.0.0.1:9880/tts/'
 GUILD_ID = int(environ.get('GUILD_ID')) if 'GUILD_ID' in environ else 933290709589577728
 
-
 QUESTION_PROMPT = """你是一個樂於助人的小妖精，總是以積極和善的態度回答問題。
 無論問題多麼困難，你都會努力給出友好和建設性的建議。
 對於需要搜尋有關於 Minecraft 的問題，請盡可能使用英文搜尋關鍵詞，但回答請使用繁體中文。
@@ -26,7 +25,6 @@ QUESTION_PROMPT = """你是一個樂於助人的小妖精，總是以積極和�
 
 現在請回答問題：
 """
-
 
 CONVERSATION_PROMPT = """## 角色扮演：雲鎮工藝的雲妹
 
@@ -69,7 +67,6 @@ CONVERSATION_PROMPT = """## 角色扮演：雲鎮工藝的雲妹
 
 現在，請以雲妹的身份開始回答用戶的問題吧！😊
 """
-
 
 ANALYSIS_MATERIAL_PROMPT = """## Minecraft 材料清單分析與準備優先順序建議
 
@@ -153,7 +150,7 @@ ANALYSIS_MATERIAL_PROMPT = """## Minecraft 材料清單分析與準備優先順�
 """
 
 google_search_tool = Tool(
-    google_search = GoogleSearch()
+    google_search=GoogleSearch()
 )
 
 
@@ -190,8 +187,9 @@ class ModelConfig:
         elif 'GOOGLE_API_KEY' in os.environ:
             self.api_key = os.environ['GOOGLE_API_KEY']
         else:
-            raise ValueError("API key not provided. Either config a environment variable 'GOOGLE_API_KEY' or pass it "
-                             "as an argument 'api_key'.")
+            raise ValueError(
+                "API key not provided. Either config a environment variable 'GOOGLE_API_KEY' or pass it "
+                "as an argument 'api_key'.")
 
         self.safety_settings = [
             {
@@ -233,3 +231,4 @@ MESSAGE_BOT_TARGET_USER_ID = 998254901538861157
 USER_SETTINGS_FILE = 'data/user_settings.json'
 USER_VOICE_SETTINGS_FILE = 'data/user_voice.json'
 REVERSE_MAPPING_FILE = 'data/game_id_to_user_id.json'
+VOICE_DIR = os.path.join(os.getcwd(), "data", "samples")

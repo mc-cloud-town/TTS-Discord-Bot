@@ -146,8 +146,8 @@ def text_to_speech(text: str, character: str, message: disnake.Message = None) -
         try:
             logger.info(f"Sending TTS request for chunk: {chunk}")
             response = requests.post(config.TTS_API_URL, json={
-                "ref_audio_path": os.path.join(os.getcwd(), "data", "samples", character_sample["file"]),
-                "refer_wav_path": os.path.join(os.getcwd(), "data", "samples", character_sample["file"]),
+                "ref_audio_path": os.path.join(config.VOICE_DIR, character_sample["file"]),
+                "refer_wav_path": os.path.join(config.VOICE_DIR, character_sample["file"]),
                 "prompt_text": character_sample["text"],
                 "prompt_lang": "zh",
                 "prompt_language": "zh",
