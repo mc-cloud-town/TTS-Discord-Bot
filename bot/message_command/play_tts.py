@@ -2,6 +2,8 @@ import disnake
 import asyncio
 import os
 import tempfile
+
+from disnake import HTTPException
 from disnake.ext import commands
 from bot.api.tts_handler import text_to_speech
 from bot import user_settings
@@ -101,7 +103,8 @@ class PlayTTS(commands.Cog):
                     )
                     await inter.edit_original_response(embed=embed)
                     break
-                except Exception as e:
+                except HTTPException as e:
+                    logger.info(f"{e.args}")
                     logger.error(f"Error fetching TTS audio: {e}")
                     if attempt < self.max_retries:
                         logger.info(f"Retrying in {self.retry_delay} seconds...")
