@@ -13,9 +13,19 @@ on:
     # Publish semver tags as releases.
     tags:
       - 'v*.*.*'
+    paths:
+      - 'bot/**'
+      - 'util/**'
+      - 'config.py'
+      - 'run.py'
   pull_request:
     branches:
       - main
+    paths:
+      - 'bot/**'
+      - 'util/**'
+      - 'config.py'
+      - 'run.py'
 
 env:
   # Use docker.io for Docker Hub if empty
