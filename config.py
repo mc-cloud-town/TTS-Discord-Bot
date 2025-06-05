@@ -15,6 +15,11 @@ load_dotenv()
 DISCORD_TOKEN = environ.get('DISCORD_TOKEN')
 TTS_API_URL = 'http://127.0.0.1:9880/tts/'
 GUILD_ID = int(environ.get('GUILD_ID')) if 'GUILD_ID' in environ else 933290709589577728
+VOICE_MANAGER_ROLE_ID = (
+    int(environ.get("VOICE_MANAGER_ROLE_ID"))
+    if "VOICE_MANAGER_ROLE_ID" in environ
+    else 1003708775284342955
+)
 LOGGER_LEVEL = logging.DEBUG
 
 QUESTION_PROMPT = """你是一個樂於助人的小妖精，總是以積極和善的態度回答問題。

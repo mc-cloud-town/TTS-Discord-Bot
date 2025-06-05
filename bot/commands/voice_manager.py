@@ -2,7 +2,7 @@ import os
 import disnake
 from disnake.ext import commands
 
-from config import GUILD_ID, VOICE_DIR
+from config import GUILD_ID, VOICE_DIR, VOICE_MANAGER_ROLE_ID
 from utils.logger import logger
 from utils.file_utils import (
     load_sample_data,
@@ -16,7 +16,7 @@ from utils.file_utils import (
 class VoiceManager(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.allowed_role = 1003708775284342955
+        self.allowed_role = VOICE_MANAGER_ROLE_ID
 
     def _has_permission(self, member: disnake.Member) -> bool:
         return any(role.id == self.allowed_role for role in member.roles)

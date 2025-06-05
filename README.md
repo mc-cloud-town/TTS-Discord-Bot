@@ -134,12 +134,13 @@ Add new voice characters by:
      }
    }
    ```
-You can also manage voices in Discord using `/voice_add`, `/voice_remove` and `/voice_edit` (requires the manager role).
+You can also manage voices in Discord using `/voice_add`, `/voice_remove` and `/voice_edit` (requires the role specified by `VOICE_MANAGER_ROLE_ID`).
 
 ### Channel Configuration
 Configure target channels in `config.py`:
 - `TTS_TARGET_CHANNEL_ID`: Channel for message-based TTS
 - `VOICE_TEXT_INPUT_CHANNEL_IDS`: Channels for automatic voice chat TTS
+- `VOICE_MANAGER_ROLE_ID`: Role allowed to add, remove and edit voice characters
 
 ## 🔧 Dependencies
 
