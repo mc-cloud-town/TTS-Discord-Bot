@@ -9,7 +9,11 @@ from bot.api.tts_handler import text_to_speech
 from bot.user_settings import is_user_voice_exist
 from bot.utils.extract_user_nickname import extract_user_nickname
 from utils.logger import logger
-from config import TTS_TARGET_CHANNEL_ID, MESSAGE_BOT_TARGET_USER_ID
+from config import (
+    TTS_TARGET_CHANNEL_ID,
+    MESSAGE_BOT_TARGET_USER_ID,
+    DEFAULT_VOICE,
+)
 
 
 class MessageListener(commands.Cog):
@@ -73,7 +77,7 @@ class MessageListener(commands.Cog):
                 logger.info(f"TTS is not enabled for user: {game_username}")
                 return
 
-            character_name = settings.get("selected_sample", "老簡")
+            character_name = settings.get("selected_sample", DEFAULT_VOICE)
 
             if character_name == '自己聲音 (需要先上傳語音樣本）':
                 if not is_user_voice_exist(user_id):
