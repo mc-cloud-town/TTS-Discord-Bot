@@ -7,10 +7,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN apt-get update && apt-get install -y \
+RUN apk update && apk add --no-cache \
   ffmpeg \
-  libsndfile1 \
-  rm -rf /var/lib/apt/lists/*
+  libsndfile
 
 ENV PYTHONUNBUFFERED=1
 
