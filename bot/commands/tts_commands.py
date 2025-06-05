@@ -27,7 +27,7 @@ class TTSCommands(commands.Cog):
             if os.name == "nt":
                 disnake.opus.load_opus("libopus-0.dll")
             else:
-                disnake.opus.load_opus("/usr/lib/libopus.so.***")
+                disnake.opus.load_opus("/usr/lib/libopus.so")
 
     @commands.slash_command(
         name="set_voice",
