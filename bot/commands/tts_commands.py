@@ -150,10 +150,7 @@ class TTSCommands(commands.Cog):
                     logger.info(f"Fetching TTS audio (attempt {attempt})...")
                     player_name = extract_user_nickname(inter.author.display_name)
                     text = f"{player_name} 說: {text}" if character_name != str(user_id) else text
-                    audio_data = text_to_speech(
-                        text,
-                        character_name,
-                    )
+                    audio_data = text_to_speech(text, character_name, )
                     logger.info("Audio data fetched successfully")
                     logger.info(f"Audio data length: {len(audio_data)} bytes")
 
@@ -173,6 +170,14 @@ class TTSCommands(commands.Cog):
                     )
                     await inter.edit_original_response(embed=embed)
                     break
+                except ValueError as e:
+                    logger.error(f'無法找到 {inter.author.name} 語音: ', e)
+                    embed = disnake.Embed(
+                        title="錯誤",
+                        description="無法取的該角色，請切換角色後嘗試。",
+                        color=disnake.Color.red(),
+                    )
+                    await inter.edit_original_response(embed=embed)
                 except Exception as e:
                     logger.debug(type(e))
                     logger.debug(type(e).__name__)

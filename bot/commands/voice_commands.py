@@ -73,7 +73,7 @@ class VoiceCommands(commands.Cog):
             await inter.edit_original_response(embed=embed)
             return
 
-        await voice_client.disconnect()
+        await voice_client.disconnect(force=True)
 
         logger.info('Bot left the voice channel')
 

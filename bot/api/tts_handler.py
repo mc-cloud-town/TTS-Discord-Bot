@@ -148,7 +148,7 @@ def text_to_speech(text: str, character: str, message: disnake.Message = None) -
     character_content = get_samples_by_character(character, sample_data, user_voice_dict)
 
     if not character_content:
-        raise Exception(f"角色 '{character}' 不存在")
+        raise ValueError(f"角色 '{character}' 不存在")
 
     character_sample = character_content
 
