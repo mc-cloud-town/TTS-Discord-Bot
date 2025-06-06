@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import disnake
@@ -101,7 +102,6 @@ class VoiceManager(commands.Cog):
                 color=disnake.Color.green(),
             )
             logger.info(f"Removed voice character {character_name}")
-            await self.reload_bot(inter)
         except ValueError:
             embed = disnake.Embed(
                 title="錯誤",
@@ -109,6 +109,7 @@ class VoiceManager(commands.Cog):
                 color=disnake.Color.red(),
             )
         await inter.edit_original_response(embed=embed)
+        await self.reload_bot(inter)
 
     @commands.slash_command(
         name="voice_edit",
@@ -173,8 +174,26 @@ class VoiceManager(commands.Cog):
             await self.reload_bot(inter)
 
     async def reload_bot(self, inter):
-        general_commands = GeneralCommands(self.bot)
-        await general_commands.reload(inter)
+        base_path = 'bot'
+        subfolders = ['commands', 'events', 'message_command']
+        errors = []
+
+        for subfolder in subfolders:
+            folder_path = os.path.join(base_path, subfolder)
+            for filename in os.listdir(folder_path):
+                if filename.endswith('.py') and filename != '__init__.py':
+                    module_name = f'{base_path}.{subfolder}.{filename[:-3]}'
+                    try:
+                        self.bot.reload_extension(module_name)
+                        logger.info(f'Reloaded extension: {module_name}')
+                    except Exception as e:
+                        logger.error(f'Failed to reload extension {module_name}: {e}')
+                        errors.append(f'Failed to reload extension {module_name}: {e}')
+
+        if errors:
+            await inter.followup.send("\n".join(errors), ephemeral=True)
+        else:
+            await inter.followup.send("所有命令已重新加載。", ephemeral=True)
 
 
 def setup(bot: commands.Bot):
