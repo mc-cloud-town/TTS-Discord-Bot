@@ -34,7 +34,8 @@ class VoiceCommands(commands.Cog):
 
         channel = voice_state.channel
         if inter.guild.me.voice is not None:
-            await inter.guild.me.move_to(channel)
+            await inter.guild.voice_client.disconnect(force=True)
+            await channel.connect()
         else:
             await channel.connect()
 
