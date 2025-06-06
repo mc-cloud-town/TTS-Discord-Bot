@@ -4,6 +4,7 @@ from pathlib import Path
 import disnake
 from disnake.ext import commands
 
+from bot.commands.general import GeneralCommands
 from config import GUILD_ID, DOWNLOAD_DIR, VOICE_MANAGER_ROLE_ID
 from utils.logger import logger
 from utils.file_utils import (
@@ -128,6 +129,7 @@ class VoiceManager(commands.Cog):
             name="語音檔案", desc="新的語音檔案（可選）", default=None
         ),
     ):
+        success = False
         if not self._has_permission(inter.author):
             await inter.response.send_message("你沒有權限使用此命令。", ephemeral=True)
             return
@@ -154,7 +156,8 @@ class VoiceManager(commands.Cog):
                 description=f"已更新角色 {character_name}",
                 color=disnake.Color.green(),
             )
-            logger.info(f"Edited voice character {character_name}")
+            logger.info(f"Edited voice character {character_name}")\
+            success = True
         except ValueError:
             if filename:
                 Path(DOWNLOAD_DIR).joinpath(filename).unlink(missing_ok=True)
@@ -165,6 +168,9 @@ class VoiceManager(commands.Cog):
             )
 
         await inter.edit_original_response(embed=embed)
+        if success:
+            await GeneralCommands(self.bot).reload(inter)
+            logger.info('reload bot success')
 
 
 def setup(bot: commands.Bot):
