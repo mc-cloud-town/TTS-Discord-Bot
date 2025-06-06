@@ -173,8 +173,8 @@ class VoiceManager(commands.Cog):
             await self.reload_bot(inter)
 
     async def reload_bot(self, inter):
-        await GeneralCommands(self.bot).reload(inter)
-        logger.info('reload bot success')
+        general_commands = GeneralCommands(self.bot)
+        await general_commands.reload(inter)
 
 
 def setup(bot: commands.Bot):
