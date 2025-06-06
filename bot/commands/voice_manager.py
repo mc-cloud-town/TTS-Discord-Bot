@@ -156,7 +156,7 @@ class VoiceManager(commands.Cog):
                 description=f"已更新角色 {character_name}",
                 color=disnake.Color.green(),
             )
-            logger.info(f"Edited voice character {character_name}")\
+            logger.info(f"Edited voice character {character_name}")
             success = True
         except ValueError:
             if filename:
