@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 import disnake
@@ -6,7 +5,6 @@ from disnake.ext import commands
 
 from bot.commands.general import GeneralCommands
 from config import GUILD_ID, DOWNLOAD_DIR, VOICE_MANAGER_ROLE_ID
-from utils.logger import logger
 from utils.file_utils import (
     load_sample_data,
     list_characters,
@@ -14,6 +12,7 @@ from utils.file_utils import (
     remove_character,
     edit_character,
 )
+from utils.logger import logger
 
 
 class VoiceManager(commands.Cog):
@@ -71,6 +70,7 @@ class VoiceManager(commands.Cog):
         )
         await inter.edit_original_response(embed=embed)
         logger.info(f"Added voice character {character_name}")
+        await self.reload_bot(inter)
 
     @commands.slash_command(
         name="voice_remove",
@@ -101,6 +101,7 @@ class VoiceManager(commands.Cog):
                 color=disnake.Color.green(),
             )
             logger.info(f"Removed voice character {character_name}")
+            await self.reload_bot(inter)
         except ValueError:
             embed = disnake.Embed(
                 title="錯誤",
@@ -169,8 +170,11 @@ class VoiceManager(commands.Cog):
 
         await inter.edit_original_response(embed=embed)
         if success:
-            await GeneralCommands(self.bot).reload(inter)
-            logger.info('reload bot success')
+            await self.reload_bot(inter)
+
+    async def reload_bot(self, inter):
+        await GeneralCommands(self.bot).reload(inter)
+        logger.info('reload bot success')
 
 
 def setup(bot: commands.Bot):
