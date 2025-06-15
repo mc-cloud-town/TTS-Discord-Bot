@@ -1,5 +1,8 @@
 import disnake
+from disnake.user import User
 from disnake.ext import commands
+from disnake.ext.commands import CommandInvokeError
+
 from utils.logger import logger
 from config import GUILD_ID
 
@@ -33,11 +36,21 @@ class VoiceCommands(commands.Cog):
             return
 
         channel = voice_state.channel
-        if inter.guild.me.voice is not None:
-            await inter.guild.voice_client.disconnect(force=True)
-            await channel.connect()
-        else:
-            await channel.connect()
+        try:
+            if inter.guild.me.voice is not None:
+                await inter.guild.voice_client.disconnect(force=True)
+                await channel.connect()
+            else:
+                await channel.connect()
+        except CommandInvokeError:
+            embed = disnake.Embed(
+                title="錯誤",
+                description="無法連接至該語音。",
+                color=disnake.Color.red()
+            )
+            await inter.edit_original_response(embed=embed)
+            logger.warn(f'can not joined voice channel: {channel.name}')
+            return
 
         logger.info(f'Bot joined voice channel: {channel.name}')
 
