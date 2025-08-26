@@ -185,7 +185,7 @@ def text_to_speech(text: str, character: str, message: disnake.Message = None) -
                 "speed_factor": 1,
                 "fragment_interval": 0.3,
                 "seed": -1,
-                "media_type": f"{Path(audio).suffix[1:]}",
+                "media_type": "wav",
                 "streaming_mode": False,
                 "parallel_infer": True,
                 "repetition_penalty": 1.35,
