@@ -73,3 +73,6 @@ dist-ssr/
 
 # Others (OS/IDE generated)
 .DS_Store
+
+# uv lock file
+uv.lock

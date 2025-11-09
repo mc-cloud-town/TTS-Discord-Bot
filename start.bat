@@ -1,2 +1,1 @@
-python .\run.py
-pause
+.venv\Scripts\python.exe run.py
