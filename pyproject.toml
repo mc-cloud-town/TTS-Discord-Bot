@@ -8,6 +8,7 @@ version = "0.1.0"
 description = "A Discord bot with TTS functionality"
 authors = [
     {name = "whats2000"},
+    {name = "shane0411"},
 ]
 dependencies = [
     "python-dotenv",
