@@ -7,9 +7,10 @@ import tempfile
 from disnake.ext import commands
 
 from bot.api.gemini_chat_history import GeminiChatHistory
-from bot.api.tts_handler import text_to_speech
+from bot.api.async_tts_handler import text_to_speech
 from bot.api.gemini_api import GeminiAPIClient
 from bot.client.base_cog import BaseCog
+from bot.utils.audio_queue import AudioItem
 from config import GUILD_ID, ModelConfig, QUESTION_PROMPT, CONVERSATION_PROMPT
 from utils.file_utils import list_characters, load_sample_data
 from utils.logger import logger
@@ -179,45 +180,32 @@ class LLMCommands(BaseCog):
             await inter.followup.send(embed=embed, ephemeral=True)
             return
 
-        async with self.lock:
-            for attempt in range(1, self.max_retries + 1):
-                try:
-                    logger.info(f"Fetching TTS audio (attempt {attempt})...")
-                    response_text = f"雲妹回覆: {response_text}"
-                    audio_data = text_to_speech(response_text, character_name)
-                    logger.info("Audio data fetched successfully")
-                    logger.info(f"Audio data length: {len(audio_data)} bytes")
+        try:
+            speech_text = f"雲妹回覆: {response_text}"
+            audio_data = await text_to_speech(speech_text, character_name)
+            logger.info(f"Audio data length: {len(audio_data)} bytes")
+            audio_item = AudioItem(
+                audio_data=audio_data,
+                voice_state=voice_state,
+                text=speech_text,
+                guild_id=inter.guild.id,
+            )
+            await self.audio_manager.add_to_queue(audio_item)
 
-                    with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_audio_file:
-                        temp_audio_file.write(audio_data)
-                        temp_audio_file_path = temp_audio_file.name
-
-                    def after_playing(error):
-                        logger.info(f'Finished playing: {error}')
-                        os.remove(temp_audio_file_path)
-
-                    voice_client.play(disnake.FFmpegPCMAudio(temp_audio_file_path), after=after_playing)
-                    logger.info("Playing audio...")
-
-                    embed = disnake.Embed(
-                        title="雲妹回覆",
-                        description=f"正在播放: {response_text}",
-                        color=disnake.Color.green()
-                    )
-                    await inter.followup.send(embed=embed, ephemeral=True)
-                    break
-                except Exception as e:
-                    logger.error(f"Error fetching TTS audio: {e}")
-                    if attempt < self.max_retries:
-                        logger.info(f"Retrying in {self.retry_delay} seconds...")
-                        await asyncio.sleep(self.retry_delay)
-                    else:
-                        embed = disnake.Embed(
-                            title="錯誤",
-                            description="獲取TTS音頻時出錯。",
-                            color=disnake.Color.red()
-                        )
-                        await inter.followup.send(embed=embed, ephemeral=True)
+            embed = disnake.Embed(
+                title="雲妹回覆",
+                description=f"已加入代播放清單: {response_text}",
+                color=disnake.Color.green()
+            )
+            await inter.followup.send(embed=embed, ephemeral=True)
+        except Exception as e:
+            logger.error(f"Error fetching TTS audio: {e}")
+            embed = disnake.Embed(
+                title="錯誤",
+                description="獲取TTS音頻時出錯。",
+                color=disnake.Color.red()
+            )
+            await inter.followup.send(embed=embed, ephemeral=True)
 
     @commands.slash_command(
         name="chat",

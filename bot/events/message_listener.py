@@ -5,9 +5,10 @@ import asyncio
 import os
 from disnake.ext import commands
 from bot import user_settings
-from bot.api.tts_handler import text_to_speech
+from bot.api.async_tts_handler import text_to_speech
 from bot.client.base_cog import BaseCog
 from bot.user_settings import is_user_voice_exist
+from bot.utils.audio_queue import AudioItem
 from bot.utils.extract_user_nickname import extract_user_nickname
 from utils.logger import logger
 from config import (
@@ -97,51 +98,22 @@ class MessageListener(BaseCog):
                 logger.info(f"User {game_username} is not in a voice channel.")
                 return
 
-            voice_client: disnake.VoiceClient | None = guild.voice_client
-
-            if not voice_client:
-                channel = voice_state.channel
-                await channel.connect()
-                voice_client = guild.voice_client
-
-            if voice_state.channel != voice_client.channel:
-                logger.info(f"Bot and user {game_username} are not in the same voice channel.")
-                return
-
-            async with self.lock:
-                for attempt in range(1, self.max_retries + 1):
-                    try:
-                        logger.info(f"Fetching TTS audio (attempt {attempt})...")
-
-                        # Get the first part of the name (split by space)
-                        player_name = extract_user_nickname(member.display_name)
-
-                        audio_data = text_to_speech(
-                            f'{player_name} 說: {user_message}' if character_name != str(user_id) else user_message,
-                            character_name,
-                        )
-                        logger.info("Audio data fetched successfully")
-                        logger.info(f"Audio data length: {len(audio_data)} bytes")
-
-                        with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_audio_file:
-                            temp_audio_file.write(audio_data)
-                            temp_audio_file_path = temp_audio_file.name
-
-                        def after_playing(error):
-                            logger.info(f'Finished playing: {error}')
-                            os.remove(temp_audio_file_path)
-
-                        voice_client.play(disnake.FFmpegPCMAudio(temp_audio_file_path), after=after_playing)
-                        logger.info("Playing audio...")
-                        break
-                    except Exception as e:
-                        logger.error(f"Error fetching TTS audio: {e}")
-                        if attempt < self.max_retries:
-                            logger.info(f"Retrying in {self.retry_delay} seconds...")
-                            await asyncio.sleep(self.retry_delay)
-                        else:
-                            logger.error("Failed to fetch TTS audio after multiple attempts.")
-                            return
+            try:
+                # Get the first part of the name (split by space)
+                player_name = extract_user_nickname(member.display_name)
+                speech_text = f'{player_name} 說: {user_message}' if character_name != str(user_id) else user_message
+                audio_data = await text_to_speech(speech_text, character_name)
+                logger.info(f"Audio data length: {len(audio_data)} bytes")
+                audio_item = AudioItem(
+                    audio_data=audio_data,
+                    voice_state=voice_state,
+                    text=speech_text,
+                    guild_id=message.guild.id,
+                )
+                await self.audio_manager.add_to_queue(audio_item)
+                logger.info("Audio data add to queue")
+            except Exception as e:
+                logger.error(f"Error fetching TTS audio: {e}")
 
 
 def setup(bot: commands.Bot):
