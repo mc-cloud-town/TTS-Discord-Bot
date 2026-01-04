@@ -6,6 +6,7 @@ import os
 from disnake.ext import commands
 from bot import user_settings
 from bot.api.tts_handler import text_to_speech
+from bot.client.base_cog import BaseCog
 from bot.user_settings import is_user_voice_exist
 from bot.utils.extract_user_nickname import extract_user_nickname
 from utils.logger import logger
@@ -16,9 +17,9 @@ from config import (
 )
 
 
-class MessageListener(commands.Cog):
+class MessageListener(BaseCog):
     def __init__(self, bot: commands.Bot):
-        self.bot = bot
+        super().__init__(bot)
         self.target_channel_id = TTS_TARGET_CHANNEL_ID
         self.target_user_id = MESSAGE_BOT_TARGET_USER_ID
         self.lock = asyncio.Lock()

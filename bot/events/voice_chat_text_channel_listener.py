@@ -7,15 +7,16 @@ from disnake.ext import commands
 
 from bot import user_settings
 from bot.api.tts_handler import text_to_speech
+from bot.client.base_cog import BaseCog
 from bot.user_settings import is_user_voice_exist
 from bot.utils.extract_user_nickname import extract_user_nickname
 from config import VOICE_TEXT_INPUT_CHANNEL_IDS, DEFAULT_VOICE
 from utils.logger import logger
 
 
-class VoiceChatTextChannelListener(commands.Cog):
+class VoiceChatTextChannelListener(BaseCog):
     def __init__(self, bot: commands.Bot):
-        self.bot = bot
+        super().__init__(bot)
         self.target_channel_ids = VOICE_TEXT_INPUT_CHANNEL_IDS
         self.lock = asyncio.Lock()
         self.max_retries = 3

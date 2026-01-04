@@ -1,10 +1,11 @@
 from disnake import Member, VoiceState
 from disnake.ext.commands import Cog, Bot
 
+from bot.client.base_cog import BaseCog
 from utils.logger import logger
 
 
-class AutoLeaveVoice(Cog):
+class AutoLeaveVoice(BaseCog):
     @Cog.listener()
     async def on_voice_state_update(self, member: Member, before: VoiceState, _: VoiceState):
         voice_client = member.guild.voice_client

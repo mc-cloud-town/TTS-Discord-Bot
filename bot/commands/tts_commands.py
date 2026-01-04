@@ -14,9 +14,9 @@ from utils.file_utils import list_characters, load_sample_data
 from utils.logger import logger
 
 
-class TTSCommands(commands.Cog):
+class TTSCommands(BaseCog):
     def __init__(self, bot: commands.Bot):
-        self.bot = bot
+        super().__init__(bot)
         self.sample_data = load_sample_data()
         self.lock = asyncio.Lock()
         self.max_retries = 3

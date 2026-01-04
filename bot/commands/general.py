@@ -3,14 +3,15 @@ import os
 import disnake
 from disnake.ext import commands
 
+from bot.client.base_cog import BaseCog
 from config import GUILD_ID
 from utils.logger import logger
 
 
-class GeneralCommands(commands.Cog):
+class GeneralCommands(BaseCog):
     def __init__(self, bot: commands.Bot):
+        super().__init__(bot)
         self.allowed_roles = [1003708775284342955]
-        self.bot = bot
 
     @commands.slash_command(
         name="ping",

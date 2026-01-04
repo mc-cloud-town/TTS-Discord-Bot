@@ -5,6 +5,7 @@ import disnake
 import pandas as pd
 from disnake.ext import commands
 
+from bot.client.base_cog import BaseCog
 from config import GUILD_ID
 from utils.logger import logger
 
@@ -28,9 +29,9 @@ def calculate_packing_type_and_quantity(total: int) -> tuple[str, float]:
         return "散裝", total / 64  # Less than a stack
 
 
-class AnalyzeMaterial(commands.Cog):
+class AnalyzeMaterial(BaseCog):
     def __init__(self, bot: commands.Bot):
-        self.bot = bot
+        super().__init__(bot)
 
     @commands.message_command(
         name="分析藍圖材料表",

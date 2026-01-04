@@ -3,13 +3,14 @@ from disnake.user import User
 from disnake.ext import commands
 from disnake.ext.commands import CommandInvokeError
 
+from bot.client.base_cog import BaseCog
 from utils.logger import logger
 from config import GUILD_ID
 
 
-class VoiceCommands(commands.Cog):
+class VoiceCommands(BaseCog):
     def __init__(self, bot: commands.Bot):
-        self.bot = bot
+        super().__init__(bot)
 
     @commands.slash_command(
         name="join_voice",

@@ -9,14 +9,15 @@ from disnake.ext import commands
 from bot.api.gemini_chat_history import GeminiChatHistory
 from bot.api.tts_handler import text_to_speech
 from bot.api.gemini_api import GeminiAPIClient
+from bot.client.base_cog import BaseCog
 from config import GUILD_ID, ModelConfig, QUESTION_PROMPT, CONVERSATION_PROMPT
 from utils.file_utils import list_characters, load_sample_data
 from utils.logger import logger
 
 
-class LLMCommands(commands.Cog):
+class LLMCommands(BaseCog):
     def __init__(self, bot: commands.Bot):
-        self.bot = bot
+        super().__init__(bot)
         self.lock = asyncio.Lock()
         self.max_retries = 3
         self.retry_delay = 2
