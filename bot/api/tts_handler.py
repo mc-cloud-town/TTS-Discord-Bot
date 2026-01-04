@@ -76,41 +76,67 @@ def preprocess_text(text: str, message: disnake.Message = None) -> str:
     return text
 
 
+# def split_text_into_chunks(text: str, chunk_size: int = 2) -> list:
+#     """
+#     將文本分割為多個文本塊，每個文本塊包含指定數量的句子
+#     Args:
+#         text (str): 要分割的文本
+#         chunk_size (int): 每個文本塊包含的句子數
+
+#     Returns:
+#         list: 包含多個文本塊的列表
+#     """
+#     # 使用標點符號和換行符進行分割
+#     sentences = re.split(r"([。！？!?]|\n)", text)
+
+#     # 處理沒有斷句標點符號
+#     if len(sentences) == 1:
+#         sentences = [text]
+#     else:
+#         sentences = [a + b for a, b in zip(sentences[::2], sentences[1::2])]
+
+#     chunks = []
+#     current_chunk = []
+
+#     for sentence in sentences:
+#         current_chunk.append(sentence.strip())
+#         if len(current_chunk) == chunk_size:
+#             chunks.append(" ".join(current_chunk))
+#             current_chunk = []
+
+#     if len(current_chunk) > 0:
+#         chunks.append(" ".join(current_chunk))
+
+#     return chunks
+
 def split_text_into_chunks(text: str, chunk_size: int = 2) -> list:
     """
     將文本分割為多個文本塊，每個文本塊包含指定數量的句子
     Args:
         text (str): 要分割的文本
         chunk_size (int): 每個文本塊包含的句子數
-
     Returns:
         list: 包含多個文本塊的列表
     """
-    # 使用標點符號和換行符進行分割
-    sentences = re.split(r"([。！？!?]|\n)", text)
-
-    # 處理沒有斷句標點符號
-    if len(sentences) == 1:
-        sentences = [text]
-    else:
-        sentences = [a + b for a, b in zip(sentences[::2], sentences[1::2])]
-
+    raw_sentences = re.split(r"([。！？!?\n])", text)
+    sentences = []
+    for i in range(0, len(raw_sentences) - 1, 2):
+        s = raw_sentences[i] + raw_sentences[i + 1]
+        if s.strip():
+            sentences.append(s.strip())
+    if len(raw_sentences) % 2 != 0:
+        last_piece = raw_sentences[-1].strip()
+        if last_piece:
+            sentences.append(last_piece)
+    if not sentences:
+        return [text] if text.strip() else []
     chunks = []
-    current_chunk = []
-
-    for sentence in sentences:
-        current_chunk.append(sentence.strip())
-        if len(current_chunk) == chunk_size:
-            chunks.append(" ".join(current_chunk))
-            current_chunk = []
-
-    if len(current_chunk) > 0:
-        chunks.append(" ".join(current_chunk))
-
+    for i in range(0, len(sentences), chunk_size):
+        group = sentences[i : i + chunk_size]
+        chunks.append(" ".join(group))
     return chunks
 
-
-def text_to_speech(text: str, character: str, message: disnake.Message = None) -> bytes:
+def text_to_speech(text: str, character: str, message: disnake.Message = None, is_preprocess: bool = False) -> bytes:
     """
     與TTS API互動的函數
     這個函數將文本轉換為語音。
@@ -139,7 +165,7 @@ def text_to_speech(text: str, character: str, message: disnake.Message = None) -
         message: Discord消息對象，用於獲取用戶和頻道名稱
     """
     # 預處理文本
-    preprocessed_text = preprocess_text(text, message)
+    preprocessed_text = text if is_preprocess else preprocess_text(text, message)
 
     chunks = split_text_into_chunks(preprocessed_text)
 
