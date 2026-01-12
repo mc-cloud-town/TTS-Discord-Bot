@@ -3,11 +3,12 @@ import os
 import disnake
 from disnake.ext import commands
 
+from bot.client.base_cog import BaseCog
 from config import GUILD_ID, BOT_MANAGER_ROLES
 from utils.logger import logger
 
 
-class GeneralCommands(commands.Cog):
+class GeneralCommands(BaseCog):
     def __init__(self, bot: commands.Bot):
         self.allowed_roles = BOT_MANAGER_ROLES
         self.bot = bot

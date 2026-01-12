@@ -1,11 +1,12 @@
 from disnake.ext import commands
 
+from bot.client.base_cog import BaseCog
 from utils.logger import logger
 
 
-class OnReady(commands.Cog):
+class OnReady(BaseCog):
     def __init__(self, bot):
-        self.bot = bot
+        super().__init__(bot)
 
     @commands.Cog.listener()
     async def on_ready(self):

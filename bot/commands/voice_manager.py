@@ -4,6 +4,7 @@ from pathlib import Path
 import disnake
 from disnake.ext import commands
 
+from bot.client.base_cog import BaseCog
 from bot.commands.general import GeneralCommands
 from config import GUILD_ID, DOWNLOAD_DIR, VOICE_MANAGER_ROLE_ID
 from utils.file_utils import (
@@ -16,9 +17,9 @@ from utils.file_utils import (
 from utils.logger import logger
 
 
-class VoiceManager(commands.Cog):
+class VoiceManager(BaseCog):
     def __init__(self, bot: commands.Bot):
-        self.bot = bot
+        super().__init__(bot)
         self.allowed_role = VOICE_MANAGER_ROLE_ID
 
     def _has_permission(self, member: disnake.Member) -> bool:

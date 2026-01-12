@@ -2,13 +2,14 @@ import disnake
 from disnake.ext import commands
 
 from bot import user_settings
+from bot.client.base_cog import BaseCog
 from config import GUILD_ID
 from utils.logger import logger
 
 
-class SetGameID(commands.Cog):
+class SetGameID(BaseCog):
     def __init__(self, bot: commands.Bot):
-        self.bot = bot
+        super().__init__(bot)
 
     @commands.slash_command(
         name="set_game_id",
