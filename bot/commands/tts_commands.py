@@ -26,7 +26,8 @@ class TTSCommands(BaseCog):
         if not disnake.opus.is_loaded():
             logger.info("Loading opus...")
             if os.name == "nt":
-                disnake.opus.load_opus("libopus-0.dll")
+                opus_path = os.path.join(os.path.dirname(disnake.__file__), 'bin', 'libopus-0.x64.dll')
+                disnake.opus.load_opus(opus_path)
             else:
                 disnake.opus.load_opus("/usr/lib/libopus.so")
 
