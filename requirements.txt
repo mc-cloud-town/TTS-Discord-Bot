@@ -1,3 +1,7 @@
+# =======================================================
+# @deprecated
+# Please use pyproject.toml to manage dependencies with uv.
+# =======================================================
 dotenv
 pandas
 google-genai
