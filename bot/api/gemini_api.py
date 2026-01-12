@@ -20,7 +20,7 @@ class GeminiAPIClient:
 
     def __init__(
         self,
-        model_name='gemini-2.0-flash',
+        model_name=None,
         default_image_prompt='請用簡短中文回答:',
         default_text_prompt='請用簡短中文回答:',
         model_config=None,
@@ -33,7 +33,7 @@ class GeminiAPIClient:
         else:
             self.model_config = ModelConfig()
 
-        self.model_name = model_name
+        self.model_name = model_name or self.model_config.model_name
         self.default_image_prompt = default_image_prompt
         self.default_text_prompt = default_text_prompt
         self.client = genai.Client(api_key=self.model_config.api_key)

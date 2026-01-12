@@ -13,6 +13,7 @@ DISCORD_TOKEN = environ.get('DISCORD_TOKEN')
 TTS_API_URL = environ.get("TTS_API_URL", "http://127.0.0.1:9880/tts/")
 GUILD_ID = int(environ.get("GUILD_ID", 933290709589577728))
 LOGGER_LEVEL = logging.DEBUG
+GEMINI_MODEL_NAME = environ.get('GEMINI_MODEL_NAME', 'gemini-2.5-flash')
 # ID
 VOICE_MANAGER_ROLE_ID = int(environ.get("VOICE_MANAGER_ROLE_ID", 933382711148695673))
 TTS_TARGET_CHANNEL_ID = int(environ.get('TTS_TARGET_CHANNEL_ID', 933384447145943071))
@@ -193,7 +194,7 @@ class ModelConfig:
         Args:
             api_key (str): The API key for the model.
         """
-        self.model_name = 'gemini-2.0-flash-exp'
+        self.model_name = GEMINI_MODEL_NAME
         self.default_prompt = 'Describe the image in a few words.'
         self.api_key = api_key if api_key else environ.get('GOOGLE_API_KEY')
         self.safety_settings = [

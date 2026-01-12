@@ -74,6 +74,7 @@
    DISCORD_TOKEN=your_discord_bot_token
    GUILD_ID=your_discord_guild_id
    GOOGLE_API_KEY=your_gemini_api_key
+   GEMINI_MODEL_NAME=gemini-2.5-flash
 
    # Optional overrides
    TTS_API_URL=http://127.0.0.1:9880/tts/
