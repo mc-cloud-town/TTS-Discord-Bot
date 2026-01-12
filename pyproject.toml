@@ -27,4 +27,9 @@ requires-python = ">=3.9, <3.13"
 packages = ["bot"]
 
 [dependency-groups]
-dev = []
+dev = [
+    "pytest",
+    "pytest-mock",
+    "pytest-asyncio",
+    "pytest-cov",
+]
