@@ -3,13 +3,13 @@ import os
 import disnake
 from disnake.ext import commands
 
-from config import GUILD_ID
+from config import GUILD_ID, BOT_MANAGER_ROLES
 from utils.logger import logger
 
 
 class GeneralCommands(commands.Cog):
     def __init__(self, bot: commands.Bot):
-        self.allowed_roles = [1003708775284342955]
+        self.allowed_roles = BOT_MANAGER_ROLES
         self.bot = bot
 
     @commands.slash_command(
