@@ -13,9 +13,9 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
 ENV PATH="/root/.local/bin:/root/.cargo/bin:$PATH"
 
-RUN uv sync --no-install-project
-
 COPY . .
+
+RUN uv sync --no-install-project
 
 ENV PYTHONUNBUFFERED=1
 
