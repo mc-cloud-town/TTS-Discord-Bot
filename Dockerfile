@@ -11,7 +11,7 @@ RUN apk update && apk add --no-cache \
 
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
-ENV PATH="/root/.cargo/bin:$PATH"
+ENV PATH="/root/.local/bin:/root/.cargo/bin:$PATH"
 
 RUN uv sync --no-install-project
 
