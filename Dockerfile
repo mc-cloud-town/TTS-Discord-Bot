@@ -2,17 +2,21 @@ FROM python:3.12-alpine
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
 RUN apk update && apk add --no-cache \
   ffmpeg \
   opus \
   opus-dev \
-  libsndfile
+  libsndfile \
+  curl
+
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
+ENV PATH="/root/.cargo/bin:$PATH"
+
+RUN uv sync --no-install-project
 
 COPY . .
 
 ENV PYTHONUNBUFFERED=1
 
-CMD ["python", "run.py"]
+CMD ["uv", "run", "python", "run.py"]
