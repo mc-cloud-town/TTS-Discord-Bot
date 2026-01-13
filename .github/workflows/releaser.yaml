@@ -12,20 +12,22 @@ on:
       - main
     # Publish semver tags as releases.
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
     paths:
-      - 'bot/**'
-      - 'util/**'
-      - 'config.py'
-      - 'run.py'
+      - "bot/**"
+      - "util/**"
+      - "config.py"
+      - "run.py"
   pull_request:
     branches:
       - main
     paths:
-      - 'bot/**'
-      - 'util/**'
-      - 'config.py'
-      - 'run.py'
+      - "bot/**"
+      - "util/**"
+      - "config.py"
+      - "run.py"
+      - ".github/workflows/releaser.yaml"
+      - "Dockerfile"
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -53,7 +55,7 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: sigstore/cosign-installer@3454372f43399081ed03b604cb2d021dabca52bb #v3.8.2
         with:
-          cosign-release: 'v2.2.4'
+          cosign-release: "v2.2.4"
 
       # Set up BuildKit Docker container builder to be able to build
       # multi-platform images and export cache
