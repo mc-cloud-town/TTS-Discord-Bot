@@ -18,6 +18,8 @@ on:
       - "util/**"
       - "config.py"
       - "run.py"
+      - ".github/workflows/releaser.yaml"
+      - "Dockerfile"
   pull_request:
     branches:
       - main
