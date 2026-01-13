@@ -10,7 +10,7 @@ from bot.client.base_cog import BaseCog
 from bot.user_settings import is_user_voice_exist
 from bot.utils.audio_queue import AudioItem
 from bot.utils.extract_user_nickname import extract_user_nickname
-from config import GUILD_ID, DEFAULT_VOICE
+from config import DEFAULT_VOICE, GUILD_ID
 from utils.file_utils import list_characters, load_sample_data
 from utils.logger import logger
 
@@ -23,10 +23,15 @@ class TTSCommands(BaseCog):
         self.max_retries = 3
         self.retry_delay = 2
 
+        try:
+            disnake.opus._OpusStruct.get_opus_version()
+        except disnake.opus.OpusNotLoaded:
+            pass
+
         if not disnake.opus.is_loaded():
             logger.info("Loading opus...")
             if os.name == "nt":
-                opus_path = os.path.join(os.path.dirname(disnake.__file__), 'bin', 'libopus-0.x64.dll')
+                opus_path = os.path.join(os.path.dirname(disnake.__file__), "bin", "libopus-0.x64.dll")
                 disnake.opus.load_opus(opus_path)
             else:
                 disnake.opus.load_opus("/usr/lib/libopus.so")
@@ -149,7 +154,7 @@ class TTSCommands(BaseCog):
             )
             await inter.edit_original_response(embed=embed)
         except ValueError as e:
-            logger.error(f'無法找到 {inter.author.name} 語音: ', e)
+            logger.error(f"無法找到 {inter.author.name} 語音: ", e)
             embed = disnake.Embed(
                 title="錯誤",
                 description="無法取的該角色，請切換角色後嘗試。",
