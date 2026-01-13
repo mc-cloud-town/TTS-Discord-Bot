@@ -1,6 +1,16 @@
-FROM python:3.12-slim
+FROM python:3.12-slim AS builder
+
+WORKDIR /app
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+COPY uv.lock pyproject.toml ./
+RUN --mount=type=cache,target=/root/.cache/uv uv sync --locked --no-install-project
+
+COPY . .
+RUN uv sync
+
+FROM python:3.12-slim
 
 WORKDIR /app
 
@@ -10,14 +20,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   libsndfile1 \
   && rm -rf /var/lib/apt/lists/*
 
-COPY uv.lock pyproject.toml ./
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-RUN --mount=type=cache,target=/root/.cache/uv \
-  --mount=type=bind,source=uv.lock,target=uv.lock \
-  --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-  uv sync --locked --no-install-project
-
-COPY . .
+COPY --from=builder /app /app
 
 ENV PYTHONUNBUFFERED=1
 
