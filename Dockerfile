@@ -1,21 +1,21 @@
-FROM python:3.12-alpine
+FROM python:3.12-slim
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
 
-RUN apk update && apk add --no-cache \
+RUN apt-get update && apt-get install -y --no-install-recommends \
   ffmpeg \
-  opus \
-  opus-dev \
-  libsndfile \
-  curl
-
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-
-ENV PATH="/root/.local/bin:/root/.cargo/bin:$PATH"
+  libopus-dev \
+  libsndfile1 \
+  && rm -rf /var/lib/apt/lists/*
+  
+RUN --mount=type=cache,target=/root/.cache/uv \
+  --mount=type=bind,source=uv.lock,target=uv.lock \
+  --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+  uv sync --locked --no-install-project
 
 COPY . .
-
-RUN uv sync --no-install-project
 
 ENV PYTHONUNBUFFERED=1
 
